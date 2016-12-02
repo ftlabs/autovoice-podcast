@@ -204,7 +204,7 @@ function checkForData(){
 								const localDestination = `${tmpPath}/${itemUUID}.mp3`;
 								fetch(audioURL)
 									.then(res => {
-										const fsStream = fs.createWriteStream(`${tmpPath}/${itemUUID}.mp3`);
+										const fsStream = fs.createWriteStream(localDestination);
 										
 										return new Promise((resolve) => {
 
@@ -245,7 +245,16 @@ function checkForData(){
 													debug(err);
 												} else {
 													debug(`${itemUUID}.ogg successfully uploaded to ${process.env.AWS_AUDIO_BUCKET}`);
-													fs.unlink(conversionDestination);
+													fs.unlink(conversionDestination, err => {
+														if(err){
+															debug(`Unable to delete ${conversionDestination} for file system`, err);
+														}
+													});
+													fs.unlink(localDestination, err => {
+														if(err){
+															debug(`Unable to delete ${localDestination} for file system`, err);
+														}
+													});
 
 													audit({
 														user : 'ABSORBER',
@@ -263,6 +272,16 @@ function checkForData(){
 									})
 									.catch(err => {
 										debug(`An error occurred when we tried to convert ${itemUUID}.mp3 to OGG and upload it to S3`, err);
+										fs.unlink(localDestination, err => {
+											if(err){
+												debug(`Unable to delete ${localDestination} for file system`, err);
+											}
+										});
+										fs.unlink(`${tmpPath}/${itemUUID}.ogg`, err => {
+											if(err){
+												debug(`Unable to delete ${tmpPath}/${itemUUID}.ogg for file system`, err);
+											}
+										});
 									})
 								;
 							} else if(err){

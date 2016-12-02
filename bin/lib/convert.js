@@ -3,6 +3,7 @@ const spawn = require('child_process').spawn;
 const ffmpeg = require('ffmpeg-static');
 
 const tmpFolder = process.env.TMP_FOLDER || '/tmp';
+const debugFFMPEG = process.env.DEBUG_FFMPEG === "true";
 
 function convertAudioFileToOgg(details){
 
@@ -12,6 +13,7 @@ function convertAudioFileToOgg(details){
 	const args = [
 		'-i',
 		details.filePath,
+		'-y',
 		'-c:a',
 		'libvorbis',
 		'-q:a',
@@ -25,7 +27,7 @@ function convertAudioFileToOgg(details){
 
 	return new Promise( (resolve, reject) => {
 
-		if(process.env.DEBUG_FFMPEG === "true"){
+		if(debugFFMPEG === true){
 
 			process.stdout.on('data', (data) => {
 				debug(`stdout: ${data}`);
@@ -36,7 +38,6 @@ function convertAudioFileToOgg(details){
 			});
 			
 		}
-
 
 		process.on('close', (code) => {
 
