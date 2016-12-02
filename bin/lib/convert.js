@@ -45,7 +45,7 @@ function convertAudioFileToOgg(details){
 				debug(`FFMPEG exited with status code 1 while converting ${details.filePath} to OGG`);
 				reject();
 			} else if(code === 0){
-				debug("FFMPEG closed and was happy");
+				debug('FFMPEG closed and was happy');
 				resolve(outputDestination);
 			}
 
