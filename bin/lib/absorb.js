@@ -199,91 +199,98 @@ function checkForData(){
 						}, function(err){
 
 							if (err && err.code === 'NotFound') {
-								debug(`We don't have an OGG version of ${itemUUID}. Beginning conversion now`);
+								debug(`We don't have an OGG version of ${itemUUID}. Creating conversion job now`);
 
-								const localDestination = `${tmpPath}/${itemUUID}.mp3`;
-								fetch(audioURL)
-									.then(res => {
-										const fsStream = fs.createWriteStream(localDestination);
-										
-										return new Promise((resolve) => {
+								if(!convert.check(itemUUID)){
 
-											fsStream.on('close', function(){
-												debug(`${itemUUID}.mp3 has been written to ${localDestination}`);
-												resolve();
-											})
+									const localDestination = `${tmpPath}/${itemUUID}.mp3`;
+									fetch(audioURL)
+										.then(res => {
+											const fsStream = fs.createWriteStream(localDestination);
+											
+											return new Promise((resolve) => {
 
-											res.body.pipe(fsStream);
+												fsStream.on('close', function(){
+													debug(`${itemUUID}.mp3 has been written to ${localDestination}`);
+													resolve();
+												})
 
-										});
+												res.body.pipe(fsStream);
 
-									})
-									.then(function(){
-										audit({
-											user : 'ABSORBER',
-											action : 'convertFileToOGG',
-											article : itemUUID
-										});
-										return convert.ogg({
-											filePath : localDestination,
-											name : itemUUID
-										});
-									})
-									.then(conversionDestination => {
-										debug(`${itemUUID} has been converted to OGG and can be found at ${conversionDestination}`);
+											});
 
-										fs.readFile(conversionDestination, (err, data) => {
+										})
+										.then(function(){
+											audit({
+												user : 'ABSORBER',
+												action : 'convertFileToOGG',
+												article : itemUUID
+											});
+											return convert.ogg({
+												filePath : localDestination,
+												name : itemUUID
+											});
+										})
+										.then(conversionDestination => {
+											debug(`${itemUUID} has been converted to OGG and can be found at ${conversionDestination}`);
 
-											S3.putObject({
-												Bucket : process.env.AWS_AUDIO_BUCKET,
-												Key : `${itemUUID}.ogg`,
-												Body : data,
-												ACL : 'public-read'
-											},function(err){
-												
-												if(err){
-													debug(err);
-												} else {
-													debug(`${itemUUID}.ogg successfully uploaded to ${process.env.AWS_AUDIO_BUCKET}`);
-													fs.unlink(conversionDestination, err => {
-														if(err){
-															debug(`Unable to delete ${conversionDestination} for file system`, err);
-														}
-													});
-													fs.unlink(localDestination, err => {
-														if(err){
-															debug(`Unable to delete ${localDestination} for file system`, err);
-														}
-													});
+											fs.readFile(conversionDestination, (err, data) => {
 
-													audit({
-														user : 'ABSORBER',
-														action : 'storeConvertedOGGToS3',
-														article : itemUUID
-													});
+												S3.putObject({
+													Bucket : process.env.AWS_AUDIO_BUCKET,
+													Key : `${itemUUID}.ogg`,
+													Body : data,
+													ACL : 'public-read'
+												},function(err){
+													
+													if(err){
+														debug(err);
+													} else {
+														debug(`${itemUUID}.ogg successfully uploaded to ${process.env.AWS_AUDIO_BUCKET}`);
+														fs.unlink(conversionDestination, err => {
+															if(err){
+																debug(`Unable to delete ${conversionDestination} for file system`, err);
+															}
+														});
+														fs.unlink(localDestination, err => {
+															if(err){
+																debug(`Unable to delete ${localDestination} for file system`, err);
+															}
+														});
 
-												}
+														audit({
+															user : 'ABSORBER',
+															action : 'storeConvertedOGGToS3',
+															article : itemUUID
+														});
 
+													}
+
+
+												})
 
 											})
 
 										})
+										.catch(err => {
+											debug(`An error occurred when we tried to convert ${itemUUID}.mp3 to OGG and upload it to S3`, err);
+											fs.unlink(localDestination, err => {
+												if(err){
+													debug(`Unable to delete ${localDestination} for file system`, err);
+												}
+											});
+											fs.unlink(`${tmpPath}/${itemUUID}.ogg`, err => {
+												if(err){
+													debug(`Unable to delete ${tmpPath}/${itemUUID}.ogg for file system`, err);
+												}
+											});
+										})
+									;
 
-									})
-									.catch(err => {
-										debug(`An error occurred when we tried to convert ${itemUUID}.mp3 to OGG and upload it to S3`, err);
-										fs.unlink(localDestination, err => {
-											if(err){
-												debug(`Unable to delete ${localDestination} for file system`, err);
-											}
-										});
-										fs.unlink(`${tmpPath}/${itemUUID}.ogg`, err => {
-											if(err){
-												debug(`Unable to delete ${tmpPath}/${itemUUID}.ogg for file system`, err);
-											}
-										});
-									})
-								;
+								} else {
+									debug(`Job to convert ${itemUUID}.mp3 to OGG already exists`);
+								}
+
 							} else if(err){
 								debug(`An error occurred querying the S3 bucket for ${itemUUID}.ogv`, err);
 							} else {
