@@ -1,0 +1,34 @@
+{
+  "name": "ftlabs-audio-absorber",
+  "version": "1.0.0",
+  "description": "It absorbs audio from 3rd party partners",
+  "main": "index.js",
+  "scripts": {
+    "start" : "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ftlabs/Absorber.git"
+  },
+  "keywords": [
+    "ftlabs"
+  ],
+  "author": "Sean M. Tracey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ftlabs/Absorber/issues"
+  },
+  "homepage": "https://github.com/ftlabs/Absorber#readme",
+  "dependencies": {
+    "assert": "^1.4.1",
+    "aws-sdk": "^2.7.10",
+    "debug": "^2.3.3",
+    "dotenv": "^2.0.0",
+    "ffmpeg-static": "^2.0.0",
+    "is-uuid": "^1.0.2",
+    "node-fetch": "^1.6.3",
+    "uuid": "^3.0.1",
+    "xml2js": "^0.4.17"
+  }
+}
