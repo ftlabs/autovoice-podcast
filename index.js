@@ -1,5 +1,5 @@
 const dotenv = require('dotenv').config();
-const debug = require('debug');
+require('./bin/lib/minimum-server');
 
 const absorber = require('./bin/lib/absorb.js');
 

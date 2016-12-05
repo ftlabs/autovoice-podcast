@@ -4,7 +4,7 @@
   "description": "It absorbs audio from 3rd party partners",
   "main": "index.js",
   "scripts": {
-    "start" : "node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,6 +25,7 @@
     "aws-sdk": "^2.7.10",
     "debug": "^2.3.3",
     "dotenv": "^2.0.0",
+    "express": "^4.14.0",
     "ffmpeg-static": "^2.0.0",
     "is-uuid": "^1.0.2",
     "node-fetch": "^1.6.3",
