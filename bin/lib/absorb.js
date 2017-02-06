@@ -53,13 +53,9 @@ function seperateQueryParams(queryString){
 
 }
 
-function checkForData(){
-	debug("Checking for data at", process.env.AUDIO_RSS_ENDPOINT);
-	audit({
-		user : "ABSORBER",
-		action : 'checkForAudioFiles'
-	});
-	fetch(process.env.AUDIO_RSS_ENDPOINT)
+function getDataFromURL(URL, provider){
+
+	return fetch(URL)
 		.then(res => res.text())
 		.then(text => parseRSSFeed(text))
 		.then(feed => {
@@ -300,6 +296,9 @@ function checkForData(){
 						});
 
 					})
+					.catch(err => {
+						debug('extract error:', err);
+					})
 				;
 
 
@@ -313,12 +312,34 @@ function checkForData(){
 
 }
 
+function checkForData(){
+	debug("Checking for data at", process.env.AUDIO_RSS_ENDPOINTS);
+	audit({
+		user : "ABSORBER",
+		action : 'checkForAudioFiles'
+	});
+
+	const feeds = JSON.parse(process.env.AUDIO_RSS_ENDPOINTS).data;
+
+	feeds.forEach(feed => {
+		getDataFromURL(feed.url, feed.provider);
+	});
+
+}
+
 function startPolling(interval, now){
 	now = now || false;
 
-	if(process.env.AUDIO_RSS_ENDPOINT === undefined){
-		debug("AUDIO_RSS_ENDPOINT environment variable is undefined. Will not poll.");
+	if(process.env.AUDIO_RSS_ENDPOINTS === undefined){
+		debug("AUDIO_RSS_ENDPOINTS environment variable is undefined. Will not poll.");
 		return false;
+	}
+
+	try{
+		JSON.parse(process.env.AUDIO_RSS_ENDPOINTS).data;
+	} catch(err){
+		debug("Could not parse AUDIO_RSS_ENDPOINTS environment variable as JSON. Will not poll.");
+		return;
 	}
 
 	if(process.env.AWS_AUDIO_BUCKET === undefined){
