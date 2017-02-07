@@ -9,7 +9,7 @@ const mail = require('./mailer');
 const generateS3PublicURL = require('./get-s3-public-url');
 const convert = require('./convert');
 const extractItemsFromiTunesRSS = require('./extract-items-from-itunes-xml');
-// const extractItemsFromRSS = require('./parse-rss-feed');
+const extractItemsFromRSS = require('./extract-items-from-rss');
 
 const S3 = new AWS.S3();
 
@@ -21,11 +21,18 @@ let poll = undefined;
 function getDataFromURL(feedInfo){
 
 	debug(feedInfo);
-	let getItems = extractItemsFromiTunesRSS(feedInfo.url);
 
-	getItems
+	let getItems = undefined;
+
+	if(feedInfo.type === 'itunes'){
+		getItems = extractItemsFromiTunesRSS;
+	} else {
+		getItems = extractItemsFromRSS
+	}
+
+	getItems(feedInfo.url)
 		.then(itemInformation => {
-			// debug(itemInformation);
+			debug(itemInformation);
 			itemInformation.forEach(datum => {
 
 				debug(datum.metadata);

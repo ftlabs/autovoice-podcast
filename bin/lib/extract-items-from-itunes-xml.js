@@ -1,4 +1,4 @@
-const debug = require('debug')('bin:lib:');
+const debug = require('debug')('bin:lib:extract-items-from-itunes-xml');
 const fetch = require('node-fetch');
 
 const extract = require('./extract-uuid');
