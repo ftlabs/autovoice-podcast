@@ -18,9 +18,14 @@ Any metadata contained in the RSS for the file (as query parameters on the audio
 If a copy of the audio file already exists in the S3 bucket, or an entry exists in the DynamoDB table, it won't be updated. If a newer file exists, the existing MP3 file and database entry must be deleted for the absorber to add them back again.
 
 ## Running the app
-The absorber needs the following environment variables to run:
+
+Clone this repo, set your 
 
 ## Environment Variables
+
+Environment variables can be set in a .env file.
+
+The absorber needs the following environment variables to run:
 
 #### AWS_ACCESS_KEY_ID
 
