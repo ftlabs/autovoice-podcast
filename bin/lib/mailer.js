@@ -23,14 +23,14 @@ const mail_post_url        = process.env.MAIL_POST_URL;
 const mail_post_auth_token = process.env.MAIL_POST_AUTH_TOKEN;
 
 const from_email_address   = `${from_email_prefix}@${from_email_subdomain}`;
-const defaultSubject       = 'Audio file retrieved from 3rd partys';
+const defaultSubject       = 'Audio file retrieved from 3rd parties';
 
 function sendMessage(data){
-	const subject = `Audio file retrieved from 3rd partys: ${data.title}, ${data.itemUUID}`;
+	const subject = `Audio file retrieved from 3rd parties: ${data.title}, ${data.itemUUID}`;
 	const plainTextContent = `
 This email is being sent to ${recipients.join(", ")}.
 
-The Business Development team (Kayode Josiah) is running an experiment with 3rd partys providing human-voiced audio files of FT articles (chosen by FirstFT, Andrew Jack). 
+The Business Development team (Kayode Josiah) is running an experiment with 3rd parties providing human-voiced audio files of FT articles (chosen by FirstFT, Andrew Jack). 
 
 A new audio file has been retrieved from the 3rd party (${data.provider}).
 for article ${data.itemUUID},
@@ -51,7 +51,7 @@ ${data.ingestorAdminUrl}
 This email is being sent to ${recipients.join(", ")}.
 </p>
 <p>
-The Business Development team (Kayode Josiah) is running an experiment with 3rd partys providing human-voiced audio files of FT articles (chosen by FirstFT, Andrew Jack). 
+The Business Development team (Kayode Josiah) is running an experiment with 3rd parties providing human-voiced audio files of FT articles (chosen by FirstFT, Andrew Jack). 
 </p>
 <p>
 A new audio file has been retrieved from the 3rd party (${data.provider}).
@@ -75,7 +75,7 @@ and the 3rd party's copy at
 
 	const post_body_data = {
 		transmissionHeader: {
-			description: "alerting that 3rd partys have generated a human-voiced audio file for another article",
+			description: "alerting that 3rd parties have generated a human-voiced audio file for another article",
 		    metadata: {
 		        audioArticleIngestionUuid: data.itemUUID
 		    },
