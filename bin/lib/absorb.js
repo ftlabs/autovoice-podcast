@@ -124,11 +124,12 @@ function getDataFromURL(feedInfo){
 
 									if(process.env.ENVIRONMENT === 'production'){
 										mail.send({
-													itemUUID: itemUUID,
-													title: item['title'] || 'no title specified',
-												ftCopyUrl: generateS3PublicURL(itemUUID),
-												slCopyUrl: metadata.originalURL,
-											ingestorAdminUrl: ingestorAdminUrl
+											itemUUID: itemUUID,
+											title: item['title'] || 'no title specified',
+											ftCopyUrl: generateS3PublicURL(itemUUID),
+											partnerCopyUrl: metadata.originalURL,
+											ingestorAdminUrl: ingestorAdminUrl,
+											provider : feedInfo.provider
 										});
 									}
 
