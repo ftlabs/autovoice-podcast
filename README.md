@@ -62,7 +62,7 @@ The type can be either `rss` for a standard RSS feed, or `itunes` for and iTunes
 
 - The name of the S3 bucket that audio will be uploaded to.
 
-#### SL_MEDIA_FORMAT
+#### DELIVERED_MEDIA_FORMAT
 
 - The expected file format of the files described by the RSS feeds
 
