@@ -2,7 +2,8 @@ const dotenv = require('dotenv').config();
 const debug = require('debug')('autovoice:index');
 const express = require('express');
 const app = express();
-// const absorber = require('./bin/lib/absorb.js');
+
+const autovoice = require('./bin/lib/autovoice');
 
 var requestLogger = function(req, res, next) {
     debug("RECEIVED REQUEST:", req.method, req.url);
@@ -26,7 +27,11 @@ app.get('/podcast', (req, res) => {
 
 app.get('/mp3', (req, res) => {
   const id = req.query.id;
-  res.send('invoked /mp3 with id=' + id);
+  const mp3Content = autovoice.mp3(id)
+  .then(mp3Content => {
+    debug('mp3Content=', mp3Content);
+    res.send(mp3Content);
+  })
 });
 
 app.listen(process.env.PORT, function(){
