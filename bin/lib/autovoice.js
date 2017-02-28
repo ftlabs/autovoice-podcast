@@ -2,7 +2,7 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 const debug = require('debug')('autovoice:lib');
 
-const extract = require('./extract-uuid');
+const extractUuid = require('./extract-uuid');
 const parseRSSFeed = require('./parse-rss-feed');
 
 function generatePodcast(rssUrl){
@@ -14,40 +14,52 @@ function generatePodcast(rssUrl){
 		.then(feed => {
 			debug('feed=', feed);
 
-			const P = feed.channel[0].item.map(item => {
+			const P = feed.channel[0].item.map((item, i)=> {
+				const guid = item['guid'][0];
+				debug('item[', i, '] guid=', guid);
 
-				return extract( item['guid'][0]._ )
-					.then(itemUUID => {
-						debug('itemUUID=', itemUUID);
-						if(itemUUID === undefined){
-							return false;
-						}
+				const uuid = extractUuid( guid );
 
-						debug('pretending to TTS, title=', tem.title[0]);
+				if (!uuid) {
+					return null;
+				} else {
+					return Promise.resolve( uuid )
+						.then(uuid => {
+							debug('item[', i, '] uuid=', uuid);
+							if(uuid === undefined){
+								return false;
+							}
 
-						const audioURL = item.link[0];
-						const metadata = {
-							uuid : itemUUID,
-							originalURL : audioURL,
-							title : item.title[0],
-							description : item.description[0],
-							published : item.pubDate[0]
-						};
+							debug('pretending to TTS, title=', item.title[0]);
 
-						return {
-							item,
-							metadata,
-							audioURL
-						};
+							const audioURL = item.link[0];
+							const metadata = {
+								uuid : uuid,
+								originalURL : audioURL,
+								title : item.title[0],
+								description : item.description[0],
+								published : item.pubDate[0]
+							};
 
-					})
-				;
+							return {
+								item,
+								metadata,
+								audioURL
+							};
 
+						})
+					;
+				}
 			});
 
+			debug('num promises=', P.length);
+
 			return Promise.all(P).then(p => {
+				debug('in Promise.all');
 				debug(p);
 				return p;
+			}, reason => {
+				debug('in Promise.all rejecting:', reason)
 			});
 
 		})

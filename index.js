@@ -22,7 +22,11 @@ app.get('/__gtg', (req, res) => {
 
 app.get('/podcast', (req, res) => {
   const rssUrl = req.query.rss;
-  res.send('invoked /podcast with rss=' + rssUrl);
+  autovoice.podcast(rssUrl)
+  .then(contentJs => JSON.stringify(contentJs) )
+  .then(contentTxt => {
+    res.send(contentTxt);
+  })
 });
 
 app.get('/mp3', (req, res) => {
