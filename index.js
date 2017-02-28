@@ -19,6 +19,16 @@ app.get('/__gtg', (req, res) => {
 	res.status(200).end();
 });
 
+app.get('/podcast', (req, res) => {
+  const rssUrl = req.query.rss;
+  res.send('invoked /podcast with rss=' + rssUrl);
+});
+
+app.get('/mp3', (req, res) => {
+  const id = req.query.id;
+  res.send('invoked /mp3 with id=' + id);
+});
+
 app.listen(process.env.PORT, function(){
 	debug('Server is listening on port', process.env.PORT);
 });
