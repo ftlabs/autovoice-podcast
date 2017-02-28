@@ -1,7 +1,7 @@
 {
-  "name": "ftlabs-audio-absorber",
+  "name": "ftlabs-automated-voices",
   "version": "1.0.0",
-  "description": "It absorbs audio from 3rd party partners",
+  "description": "It generates podcasts of FT articles using automated voices",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -9,17 +9,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ftlabs/Absorber.git"
+    "url": "git+https://github.com/ftlabs/...git"
   },
   "keywords": [
     "ftlabs"
   ],
-  "author": "Sean M. Tracey",
+  "author": "Sean M. Tracey, Chris Gathercole",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ftlabs/Absorber/issues"
+    "url": "https://github.com/ftlabs/.../issues"
   },
-  "homepage": "https://github.com/ftlabs/Absorber#readme",
+  "homepage": "https://github.com/ftlabs/...#readme",
   "dependencies": {
     "assert": "^1.4.1",
     "aws-sdk": "^2.7.10",
