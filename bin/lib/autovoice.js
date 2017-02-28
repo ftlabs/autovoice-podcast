@@ -8,6 +8,15 @@ const parseRSSFeed = require('./parse-rss-feed');
 function generatePodcast(rssUrl){
 	debug('rssUrl=', rssUrl);
 
+	// fetch the full rss feed
+	// loop over each item
+	// - establish if refers to an article with a valid uuid (return null if not)
+	// - invoke the TTS service on the description text
+	// - cache the mp3 and/or create a map of audio url name to the TTS service call
+	// - return the item data, including audio url
+	// Wait til all the processing is done
+	// construct the new rss feed
+
 	return fetch(rssUrl)
 		.then(res  => res.text())
 		.then(text => parseRSSFeed(text))
@@ -32,19 +41,15 @@ function generatePodcast(rssUrl){
 
 							debug('pretending to TTS, title=', item.title[0]);
 
-							const audioURL = item.link[0];
-							const metadata = {
-								uuid : uuid,
-								originalURL : audioURL,
-								title : item.title[0],
-								description : item.description[0],
-								published : item.pubDate[0]
-							};
+							const description = item.description[0];
 
 							return {
-								item,
-								metadata,
-								audioURL
+								original : {
+									title   : item.title[0],
+									guid    : guid,
+								  pubdate : item.pubDate[0], // NB this should be the now time
+								},
+								tts : {}
 							};
 
 						})
@@ -56,7 +61,6 @@ function generatePodcast(rssUrl){
 
 			return Promise.all(P).then(p => {
 				debug('in Promise.all');
-				debug(p);
 				return p;
 			}, reason => {
 				debug('in Promise.all rejecting:', reason)
