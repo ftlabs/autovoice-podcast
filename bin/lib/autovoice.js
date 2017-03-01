@@ -1,12 +1,20 @@
 const fs = require('fs');
 const fetch = require('node-fetch');
 const debug = require('debug')('autovoice:lib');
+const RSS = require('rss');
 
 const extractUuid  = require('./extract-uuid');
 const parseRSSFeed = require('./parse-rss-feed');
 const tts          = require('./get-tts');
+const reformat     = require('./reformat');
 
-//------ cache of Audio ItemData structs-------
+const SERVER_ROOT   = process.env.SERVER_ROOT;
+if (! SERVER_ROOT ) {
+	throw new Error('ERROR: SERVER_ROOT not specified in env');
+}
+
+/////////////////////////////////////////////////
+//------ cache of Audio ItemData structs-------//
 const audioItemCache = {}; // mapping fileId to itemData
 
 function storeAudioItemData( itemData ) {
@@ -26,6 +34,28 @@ function retrieveAudioItemData ( fileId ) {
 	}
 }
 //------eof cache--------
+
+function constructRSS(rssUrl, items) {
+	const feed = new RSS({
+		title       : "Automated Voices",
+		description : "A Podcast/RSS feed of automated voices of FT articles, based on an RSS feed of article content",
+		site_url    : rssUrl,
+	});
+
+	items.forEach(item => {
+		if (item) {
+			feed.item({
+				title   : item.title,
+				url    : `${SERVER_ROOT}/${item.fileId}`,
+				pubdate : item.pubdate,
+				guid    : item.guid
+			});
+		}
+
+	});
+
+	return feed.xml();
+}
 
 function generatePodcast(rssUrl){
 	debug('rssUrl=', rssUrl);
@@ -62,6 +92,7 @@ function generatePodcast(rssUrl){
 							}
 
 							var itemData = {
+								rssUrl  : rssUrl,
 								content : item.description[0],
 								voiceId : tts.defaultVoiceId,
 								title   : item.title[0],
@@ -84,7 +115,7 @@ function generatePodcast(rssUrl){
 
 							const fileId = '/audio_file.mp3?' + [
 									    'duration=' + itemData.duration,
-									'narrator-id= ' + itemData['narrator-id'],
+								   'narrator-id=' + itemData['narrator-id'],
 								          'uuid=' + itemData.uuid,
 									    'is-human=' + itemData['is-human'],
 									      'format=' + itemData.format
@@ -99,9 +130,10 @@ function generatePodcast(rssUrl){
 
 			debug('num promises=', promises.length);
 
-			return Promise.all(promises).then(p => {
+			return Promise.all(promises).then(items => {
 				debug('in Promise.all');
-				return p;
+				const feed = constructRSS(rssUrl, items);
+				return feed;
 			}, reason => {
 				debug('in Promise.all rejecting:', reason)
 			});

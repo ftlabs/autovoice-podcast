@@ -23,9 +23,9 @@ app.get('/__gtg', (req, res) => {
 app.get('/podcast', (req, res) => {
   const rssUrl = req.query.rss;
   autovoice.podcast(rssUrl)
-  .then(contentJs => JSON.stringify(contentJs, null, 2) )
-  .then(contentTxt => {
-    res.send(contentTxt);
+  .then(feed => {
+    res.set('Content-Type', 'application/rss+xml');
+    res.send(feed);
   })
 });
 

@@ -29,6 +29,8 @@
     "ffmpeg-static": "^2.0.0",
     "is-uuid": "^1.0.2",
     "node-fetch": "^1.6.3",
+    "rss": "^1.2.1",
+    "striptags": "^2.1.1",
     "uuid": "^3.0.1",
     "xml2js": "^0.4.17"
   }
