@@ -77,6 +77,28 @@ function constructRSS(rssUrl, items) {
 	return lines.join("\n");
 }
 
+function formatContentForReading(itemData) {
+	let texts = [
+		`This article is narrated by ${itemData['narrator-id']}, as part of an ongoing experiment with artificial voices.`,
+		itemData.title
+	];
+
+	if (itemData.author) {
+		texts.push(`Written by ${itemData.author}`);
+	}
+
+	texts.push(itemData.content);
+
+	texts.push(`This article was ${itemData.title}.`);
+	if (itemData.author) {
+		texts.push(`Written by ${itemData.author}`);
+	}
+
+  texts.push(`This article was narrated by ${itemData['narrator-id']}, as part of an ongoing experiment with artificial voices.`);
+
+	return texts.join("\n");
+}
+
 function generatePodcast(rssUrl){
 	debug('rssUrl=', rssUrl);
 
@@ -117,8 +139,12 @@ function generatePodcast(rssUrl){
 								voiceId : tts.defaultVoiceId,
 								title   : item.title[0],
 								guid    : guid,
-								pubdate : item.pubDate[0], // <-- NB this should be the now time
+								pubdate : item.pubDate[0], // <-- NB this should be the now time,
+						    author  : item.author[0],
+								'narrator-id' : tts.defaultVoiceId,
 							}
+
+							itemData['contentForReading'] = formatContentForReading( itemData );
 
 							debug('pretending to TTS, title=', item.title[0], ', voiceId=', itemData.voiceId);
 
@@ -126,7 +152,6 @@ function generatePodcast(rssUrl){
 
 							itemData = Object.assign({}, itemData, {
 								duration      : 10, // <-- NB this needs to be calculated
-								'narrator-id' : tts.defaultVoiceId,
 								uuid          : uuid,
 								'is-human'    : false,
 								format        : 'mp3',
