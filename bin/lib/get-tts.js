@@ -1,8 +1,15 @@
 const fetch = require('node-fetch');
 const debug = require('debug')('autovoice:get-tts');
 
-const TTS_URL   = process.env.TTS_URL || throw new Error('ERROR: TTS_URL not specified in env');
-const TTS_TOKEN = process.TTS_TOKEN   || throw new Error('ERROR: TTS_TOKEN not specified in env');
+const TTS_URL   = process.env.TTS_URL;
+if (! TTS_URL ) {
+	throw new Error('ERROR: TTS_URL not specified in env');
+}
+
+const TTS_TOKEN = process.env.TTS_TOKEN;
+if( ! TTS_TOKEN) {
+	throw new Error('ERROR: TTS_TOKEN not specified in env');
+}
 
 module.exports = function(content, voice){
 

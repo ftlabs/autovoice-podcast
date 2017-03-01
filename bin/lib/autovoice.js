@@ -4,6 +4,7 @@ const debug = require('debug')('autovoice:lib');
 
 const extractUuid = require('./extract-uuid');
 const parseRSSFeed = require('./parse-rss-feed');
+const tts = require('./get-tts');
 
 function generatePodcast(rssUrl){
 	debug('rssUrl=', rssUrl);
