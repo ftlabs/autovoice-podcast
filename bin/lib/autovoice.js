@@ -89,9 +89,9 @@ function formatContentForReading(itemData) {
 	// <span class="ft-bold">Sign up to receive FirstFT by email
 	// <a title="FirstFT" href="http://nbe.ft.com/nbe/profile.cfm?firstft=Y">here</a> </span>
 
-	let ffIntro = new Regexp('<span\s+class="[^"]+">Sign up to receive FirstFT by email\s*<a\s+[^>]+>here<\/a>\s*<\/span>');
+	let ffIntro = new RegExp('<span\s+class="[^"]+">Sign up to receive FirstFT by email\s*<a\s+[^>]+>here<\/a>\s*<\/span>');
 
-	let content = temData.content.replace(ffIntro, "");
+	let content = itemData.content.replace(ffIntro, "");
 
 	texts.push(content);
 
