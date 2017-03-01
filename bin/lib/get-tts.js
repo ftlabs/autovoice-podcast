@@ -11,58 +11,69 @@ if( ! TTS_TOKEN) {
 	throw new Error('ERROR: TTS_TOKEN not specified in env');
 }
 
-const allVoices = [
-	'Geraint (Welsh English)',
-	'Gwyneth (Welsh)',
-	'Hans (German)',
-	'Marlene (German)',
-	'Nicole (Australian)',
-	'Russell (Australian)',
-	'Amy (British)',
-	'Brian (British)',
-	'Emma (British)',
-	'Raveena (Indian English)',
-	'Ivy (US)',
-	'Joanna (US)',
-	'Joey (US)',
-	'Justin (US)',
-	'Kendra (US)',
-	'Kimberly (US)',
-	'Salli (US)',
-	'Celine (French)',
-	'Mathieu (French)'
+const voiceIdToName = {
+	Geraint  : 'Geraint (Welsh English)',
+	Gwyneth  : 'Gwyneth (Welsh)',
+	Hans     : 'Hans (German)',
+	Marlene  : 'Marlene (German)',
+	Nicole   : 'Nicole (Australian)',
+	Russell  : 'Russell (Australian)',
+	Amy      : 'Amy (British)',
+	Brian    : 'Brian (British)',
+	Emma     : 'Emma (British)',
+	Raveena  : 'Raveena (Indian English)',
+	Ivy      : 'Ivy (US)',
+	Joanna   : 'Joanna (US)',
+	Joey     : 'Joey (US)',
+	Justin   : 'Justin (US)',
+	Kendra   : 'Kendra (US)',
+	Kimberly : 'Kimberly (US)',
+	Salli    : 'Salli (US)',
+	Celine   : 'Celine (French)',
+	Mathieu  : 'Mathieu (French)'
+}
+
+const britishVoiceIds = [
+	'Geraint',
+	'Gwyneth',
+	'Amy',
+	'Brian',
+	'Emma',
 ];
 
-const britishVoices = [
-	'Geraint (Welsh English)',
-	'Gwyneth (Welsh)',
-	'Amy (British)',
-	'Brian (British)',
-	'Emma (British)',
-];
+const defaultVoiceId = 'Emma';
 
-const defaultVoice = 'Emma (British)';
+function getMp3(content, voiceId){
+	if (! voiceId ) {
+		throw new Error('ERROR: no voiceId specified for getMp3');
+	}
 
-function getMp3(content, voice){
+	if (! voiceIdToName.hasOwnProperty(voiceId) ) {
+		throw new Error('ERROR: voiceId=' + voiceId + ' not recognised');
+	}
+
+	const voiceName = voiceIdToName(voiceId);
 
 	const url = TTS_URL + '?token=' + TOKEN;
 	const bodyObj = {
 		content : content,
-		voice   : voice
+		voice   : voiceName
 	};
 
-	// returns the mp3 bytes
+	// returns the mp3 bytes as a buffer
 
 	return fetch(url, {
 		method : 'POST',
 		body   : JSON.stringify( bodyObj )
 	})
+	.then( res => res.buffer() )
 	;
 }
 
 module.exports = {
-	mp3 : getMp3,
-	allVoices,
-	britishVoices,
-	defaultVoice
+	mp3          : getMp3,
+
+	allVoicesIds : Object.keys(voiceIdToName),
+	britishVoiceIds,
+	defaultVoiceId
 };
