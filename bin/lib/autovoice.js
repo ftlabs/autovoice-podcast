@@ -35,26 +35,46 @@ function retrieveAudioItemData ( fileId ) {
 }
 //------eof cache--------
 
+function cdataifyElement(element, text){
+	return `<${element}><![CDATA[${text}]]></${element}>`;
+}
+
 function constructRSS(rssUrl, items) {
-	const feed = new RSS({
-		title       : "Automated Voices",
-		description : "A Podcast/RSS feed of automated voices of FT articles, based on an RSS feed of article content",
-		site_url    : rssUrl,
-	});
+
+	let lines = [
+		`<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">`,
+    `<channel>`,
+			cdataifyElement('title', 'Automated Voices'),
+			cdataifyElement('link', rssUrl),
+			cdataifyElement('description', 'A Podcast/RSS feed of automated voices of FT articles, based on an RSS feed of article content'),
+			cdataifyElement('generator', 'FT Labs autovoice-podcast'),
+			cdataifyElement('docs', 'http://blogs.law.harvard.edu/tech/rss'),
+			cdataifyElement('language', 'en'),
+			cdataifyElement('pubDate', 'Thu, 01 Jan 1970 00:00:01 +0000'),
+			cdataifyElement('lastBuildDate', 'Thu, 01 Jan 1970 00:00:01 +0000'),
+	    `<atom:link href="https://example.com/rss.xml" rel="self" type="application/rss+xml"/>`,
+	];
 
 	items.forEach(item => {
 		if (item) {
-			feed.item({
-				title   : item.title,
-				url    : `${SERVER_ROOT}/${item.fileId}`,
-				pubdate : item.pubdate,
-				guid    : item.guid
-			});
+			lines = lines.concat([
+				`<item>`,
+					cdataifyElement('title', item.title),
+					cdataifyElement('link', SERVER_ROOT + item.fileId),
+					cdataifyElement('description', 'deliberately left blank'),
+					cdataifyElement('pubDate', item.pubdate),
+					`<guid isPermaLink="true">![CDATA[ ${item.guid} ]]</guid>`,
+				`</item>`,
+			]);
 		}
-
 	});
 
-	return feed.xml();
+	lines = lines.concat([
+		`</channel>`,
+		`</rss>`,
+	]);
+
+	return lines.join("\n");
 }
 
 function generatePodcast(rssUrl){
