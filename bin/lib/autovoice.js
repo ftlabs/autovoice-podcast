@@ -86,8 +86,14 @@ function formatContentForReading(itemData) {
 	if (itemData.author) {
 		texts.push(`Written by ${itemData.author}`);
 	}
+	// <span class="ft-bold">Sign up to receive FirstFT by email
+	// <a title="FirstFT" href="http://nbe.ft.com/nbe/profile.cfm?firstft=Y">here</a> </span>
 
-	texts.push(itemData.content);
+	let ffIntro = new Regexp('<span\s+class="[^"]+">Sign up to receive FirstFT by email\s*<a\s+[^>]+>here<\/a>\s*<\/span>');
+
+	let content = temData.content.replace(ffIntro, "");
+
+	texts.push(content);
 
 	texts.push(`This article was ${itemData.title}.`);
 	if (itemData.author) {
