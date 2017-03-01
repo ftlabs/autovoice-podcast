@@ -11,7 +11,39 @@ if( ! TTS_TOKEN) {
 	throw new Error('ERROR: TTS_TOKEN not specified in env');
 }
 
-module.exports = function(content, voice){
+const allVoices = [
+	'Geraint (Welsh English)',
+	'Gwyneth (Welsh)',
+	'Hans (German)',
+	'Marlene (German)',
+	'Nicole (Australian)',
+	'Russell (Australian)',
+	'Amy (British)',
+	'Brian (British)',
+	'Emma (British)',
+	'Raveena (Indian English)',
+	'Ivy (US)',
+	'Joanna (US)',
+	'Joey (US)',
+	'Justin (US)',
+	'Kendra (US)',
+	'Kimberly (US)',
+	'Salli (US)',
+	'Celine (French)',
+	'Mathieu (French)'
+];
+
+const britishVoices = [
+	'Geraint (Welsh English)',
+	'Gwyneth (Welsh)',
+	'Amy (British)',
+	'Brian (British)',
+	'Emma (British)',
+];
+
+const defaultVoice = 'Emma (British)';
+
+function getMp3(content, voice){
 
 	const url = TTS_URL + '?token=' + TOKEN;
 	const bodyObj = {
@@ -27,3 +59,10 @@ module.exports = function(content, voice){
 	})
 	;
 }
+
+module.exports = {
+	mp3 : getMp3,
+	allVoices,
+	britishVoices,
+	defaultVoice
+};
