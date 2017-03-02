@@ -13,6 +13,8 @@ if (! SERVER_ROOT ) {
 	throw new Error('ERROR: SERVER_ROOT not specified in env');
 }
 
+const MP3_PATH = '/audio.mp3';
+
 /////////////////////////////////////////////////
 //------ cache of Audio ItemData structs-------//
 const audioItemCache = {}; // mapping fileId to itemData
@@ -65,7 +67,7 @@ function constructRSS(rssUrl, items) {
 			lines = lines.concat([
 				`<item>`,
 					cdataifyElement('title', item.title),
-					cdataifyElement('link', SERVER_ROOT + '/mp3?id=' + encodeURIComponent(item.fileId)),
+					cdataifyElement('link', SERVER_ROOT + MP3_PATH + '?id=' + encodeURIComponent(item.fileId)),
 					cdataifyElement('description', 'deliberately left blank'),
 					cdataifyElement('pubDate', item.pubdate),
 					`<guid isPermaLink="true">![CDATA[ ${item.guid} ]]</guid>`,
