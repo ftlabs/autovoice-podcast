@@ -171,7 +171,7 @@ function generatePodcast(rssUrl){
 							}
 
 							let contentForReading = formatContentForReading( itemData );
-							if (i > 0) {
+							if (i > 3) {
 								debug('generatePodcast: setting contentForReading=""');
 								contentForReading = "";
 							}
