@@ -11,6 +11,7 @@ var requestLogger = function(req, res, next) {
 }
 
 app.use(requestLogger);
+app.use('/static', express.static('static'));
 
 app.get('/', (req, res) => {
 	res.status(200).end();

@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
 const debug = require('debug')('autovoice:get-tts');
+const fs    = require('fs');
 
 const TTS_URL   = process.env.TTS_URL;
 if (! TTS_URL ) {
@@ -42,6 +43,7 @@ const britishVoiceIds = [
 ];
 
 const defaultVoiceId = 'Emma';
+const defaultMp3File = 'static/audio/test.mp3';
 
 function getMp3(content, voiceId){
 	if (! voiceId ) {
@@ -52,22 +54,29 @@ function getMp3(content, voiceId){
 		throw new Error('ERROR: voiceId=' + voiceId + ' not recognised');
 	}
 
-	const voiceName = voiceIdToName(voiceId);
+	const voiceName = voiceIdToName[voiceId];
 
-	const url = TTS_URL + '?token=' + TOKEN;
-	const bodyObj = {
-		content : content,
-		voice   : voiceName
-	};
+	// return the mp3 bytes as a buffer
 
-	// returns the mp3 bytes as a buffer
+	if (content) {
+		const url = TTS_URL + '?token=' + TTS_TOKEN;
+		const bodyObj = {
+			content : content,
+			voice   : voiceName
+		};
+		const bodyObjJson = JSON.stringify( bodyObj );
 
-	return fetch(url, {
-		method : 'POST',
-		body   : JSON.stringify( bodyObj )
-	})
-	.then( res => res.buffer() )
-	;
+		debug('getMp3: url=' + url + "\nbody=" + bodyObjJson);
+
+		return fetch(url, {
+			method : 'POST',
+			body   : bodyObjJson
+		})
+		.then( res => res.buffer() )
+		;
+	} else {
+		return Promise.resolve( fs.readFileSync(defaultMp3File) );
+	}
 }
 
 module.exports = {
