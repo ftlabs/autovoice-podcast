@@ -69,8 +69,9 @@ function getMp3(content, voiceId){
 		debug('getMp3: url=' + url + "\nbody=" + bodyObjJson);
 
 		return fetch(url, {
-			method : 'POST',
-			body   : bodyObjJson
+			method  : 'POST',
+			body    : bodyObjJson,
+			headers : { 'Content-Type' : 'application/json' }
 		})
 		.then( res => res.buffer() )
 		;
