@@ -75,6 +75,7 @@ function getMp3(content, voiceId){
 		.then( res => res.buffer() )
 		;
 	} else {
+		debug('getMp3: no content, so using file=' + defaultMp3File);
 		return Promise.resolve( fs.readFileSync(defaultMp3File) );
 	}
 }

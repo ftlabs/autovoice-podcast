@@ -84,6 +84,10 @@ function constructRSS(rssUrl, items) {
 	return lines.join("\n");
 }
 
+const     ffIntroRegexp = new RegExp('<span[^>]+>Sign up to receive FirstFT by email <a[^>]+>here<\/a>');
+const speechMarksRegexp = new RegExp('"', "g");
+const    newlinesRegexp = new RegExp('\\n(\\n)+', "g");
+
 function formatContentForReading(itemData) {
 	let texts = [
 		`This article is narrated by ${itemData['narrator-id']}, as part of an ongoing experiment with artificial voices.`,
@@ -97,17 +101,16 @@ function formatContentForReading(itemData) {
 	// <span class="ft-bold">Sign up to receive FirstFT by email
 	// <a title="FirstFT" href="http://nbe.ft.com/nbe/profile.cfm?firstft=Y">here</a> </span>
 
-	let ffIntro = new RegExp('<span[^>]+>Sign up to receive FirstFT by email <a[^>]+>here<\/a>');
-
-	if (itemData.content.match(ffIntro)) {
-		debug(`formatContentForReading: matched ffIntro in article w/title=${itemData.title}`);
+	if (itemData.content.match(ffIntroRegexp)) {
+		debug(`formatContentForReading: matched ffIntroRegexp in article w/title=${itemData.title}`);
 	}
 
-	let content = itemData.content.replace(ffIntro, "");
+	let content = itemData.content.replace(ffIntroRegexp, "");
+	content = reformat( content );
+	content = content.replace(speechMarksRegexp, "\'");
+	content = content.replace(newlinesRegexp, '\n');
 
 	// also parse/rewrite some of the firstFT-specific text e.g. the attributions in brackets
-
-	content = reformat( content );
 
 	texts.push(content);
 
