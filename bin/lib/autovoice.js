@@ -1,13 +1,13 @@
 const fetch = require('node-fetch');
 const debug = require('debug')('autovoice:lib');
 
-const extractUuid  = require('./extract-uuid');
-const parseRSSFeed = require('./parse-rss-feed');
-const tts          = require('./get-tts');
-const dataItemsCache = require('./dataItemsCache');
-const constructRSS = require('./constructRSS');
+const             extractUuid = require('./extract-uuid');
+const            parseRSSFeed = require('./parse-rss-feed');
+const                     tts = require('./get-tts');
+const          dataItemsCache = require('./dataItemsCache');
+const            constructRSS = require('./constructRSS');
 const formatContentForReading = require('./formatContentForReading');
- 
+
 function generatePodcast(rssUrl){
 	debug('rssUrl=', rssUrl);
 

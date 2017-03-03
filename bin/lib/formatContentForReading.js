@@ -1,4 +1,4 @@
-const debug     = require('debug')('bin:lib:formatContentForReading');
+const     debug = require('debug')('bin:lib:formatContentForReading');
 const striptags = require('striptags');
 
 const     ffIntroRegexp = new RegExp('<span[^>]+>Sign up to receive FirstFT by email <a[^>]+>here<\/a>');

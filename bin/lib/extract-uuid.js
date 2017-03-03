@@ -1,5 +1,5 @@
 const isUUID = require('is-uuid');
-const debug = require('debug')('bin:lib:extract-uuid');
+const  debug = require('debug')('bin:lib:extract-uuid');
 
 module.exports = function(str){
 

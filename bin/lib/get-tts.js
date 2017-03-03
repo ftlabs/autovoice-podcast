@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const debug = require('debug')('autovoice:get-tts');
-const fs    = require('fs');
+const    fs = require('fs');
 
 const TTS_URL   = process.env.TTS_URL;
 if (! TTS_URL ) {

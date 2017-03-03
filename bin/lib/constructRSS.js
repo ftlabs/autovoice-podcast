@@ -1,5 +1,5 @@
 const debug = require('debug')('bin:lib:constructRSS');
-const RSS = require('rss');
+const   RSS = require('rss');
 
 const SERVER_ROOT = process.env.SERVER_ROOT;
 if (! SERVER_ROOT ) {
