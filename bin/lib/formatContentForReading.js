@@ -3,9 +3,10 @@ const striptags = require('striptags');
 
 const ACRONYMS = [
 	'BBC',
+	'CEO',
+	'CIO',
 	'EU',
 	'FBI',
-	'FT',
 	'ICE',
 	'IMF',
 	'IPO',
@@ -23,36 +24,44 @@ const ACRONYMS_PATTERN = `\\b(${ACRONYMS.join('|') })\\b`;
 const ACRONYMS_REGEXP  = new RegExp(ACRONYMS_PATTERN, 'g');
 debug(`ACRONYMS_REGEXP=${ACRONYMS_REGEXP}`);
 
-module.exports = function(itemData) {
+function processText(rawContent) {
 
-	let texts = [
-		`This article is narrated by ${itemData['narrator-id']}, as part of an ongoing experiment with artificial voices.`,
-		itemData.title
-	];
-
-	if (itemData.author) {
-		texts.push(`Written by ${itemData.author}`);
-	}
-
-	// <span class="ft-bold">Sign up to receive FirstFT by email
-	// <a title="FirstFT" href="http://nbe.ft.com/nbe/profile.cfm?firstft=Y">here</a> </span>
-
-	let content = itemData.content
+	let content = rawContent
 	.replace(/<span[^>]+>Sign up to receive FirstFT by email <a[^>]+>here<\/a>/g, '')
 	.replace(/<p[^>]*>/g, '. ')
 	.replace(/<\/p[^>]*>/g, '. ')
 	;
 
 	content = striptags( content )
+	.replace(/Test your knowledge with the week in news +quiz/, ' ')
+	.replace(/per cent/, 'percent')
 	.replace(ACRONYMS_REGEXP, match => { return match.split('').join('.') })
 	.replace(/"/g, "\'")
-	.replace(/\\n(\\n)+/g, '\n')
-	.replace(/\. (\. )+/g, '. ')
+	.replace(/\\n/g, '\n')
+	.replace(/\n+/g, ' ')
+	.replace(/\.(\s*\.)+/g, '.')
+	.replace(/\s+/g, ' ')
 	;
 
-	// also parse/rewrite some of the firstFT-specific text e.g. the attributions in brackets
+	return content;
+}
 
-	texts.push(content);
+
+function wrapped(itemData) {
+
+	let texts = [
+		`This article is narrated by ${itemData['narrator-id']}, as part of an ongoing experiment with artificial voices.`,
+		`This article is titled: ${itemData.title}.`
+	];
+
+	if (itemData.author) {
+		const author = itemData.author
+		.replace(/\s*[bB]y\s+/, '')
+		.replace(/,([^,]+)$/, (match, p1) => { return ` and ${p1}. `})
+		texts.push(`This article was written by ${author}.`);
+	}
+
+	texts.push( processText(itemData.content) );
 
 	texts.push(`This article was titled ${itemData.title}.`);
 	if (itemData.author) {
@@ -63,3 +72,8 @@ module.exports = function(itemData) {
 
 	return texts.join("\n");
 }
+
+module.exports = {
+	wrapped,
+ 	processText
+};

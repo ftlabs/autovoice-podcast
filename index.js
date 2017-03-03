@@ -4,6 +4,8 @@ const express = require('express');
 const app = express();
 
 const autovoice = require('./bin/lib/autovoice');
+const formatContentForReading = require('./bin/lib/formatContentForReading');
+
 
 var requestLogger = function(req, res, next) {
     debug("RECEIVED REQUEST:", req.method, req.url);
@@ -39,6 +41,14 @@ app.get('/audio.mp3', (req, res) => {
     res.send(mp3Content);
   })
 });
+
+app.get('/format', (req, res) => {
+  const text = req.query.text;
+  const formattedText = formatContentForReading.processText(text);
+  res.set('Content-Type', 'text/plain');
+  res.send(`${text}\n------\n${formattedText}`);
+});
+
 
 app.listen(process.env.PORT, function(){
 	debug('Server is listening on port', process.env.PORT);
