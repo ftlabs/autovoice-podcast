@@ -17,22 +17,32 @@ const MP3_PATH = '/audio.mp3';
 
 /////////////////////////////////////////////////
 //------ cache of Audio ItemData structs-------//
-const audioItemCache = {}; // mapping fileId to itemData
+const audioItemCache = {}; // mapping fileIdWithoutDuration to itemData
 
 function storeAudioItemData( itemData ) {
-	if( itemData && itemData['fileId'] ) {
-		audioItemCache[ itemData['fileId'] ] = itemData;
-		return itemData['fileId'];
+	if( itemData && itemData.fileIdWithoutDuration ) {
+		audioItemCache[ itemData.fileIdWithoutDuration ] = itemData;
+		return itemData.fileIdWithoutDuration;
 	} else {
 		return null;
 	}
 }
 
 function retrieveAudioItemData ( fileId ) {
-	if (fileId && audioItemCache[fileId] ) {
-		return audioItemCache[fileId];
-	} else {
+	if (! fileId ) {
 		return null;
+	} else { // strip out duration=num, wherever it appears in the fileId
+		const fileIdWithoutDuration = fileId
+			.replace(/\bduration=\d+&?\b/, '')
+			.replace(/&$/, '');
+
+		debug(`retrieveAudioItemData: fileId=${fileId}, fileIdWithoutDuration=${fileIdWithoutDuration}`);
+
+		if (! audioItemCache[fileIdWithoutDuration] ) {
+			return null;
+		} else {
+			return audioItemCache[fileIdWithoutDuration];
+		}
 	}
 }
 
@@ -168,7 +178,19 @@ function generatePodcast(rssUrl){
 						    author  : item.author[0],
 								'narrator-id' : tts.defaultVoiceId,
 								processingIndex : i,
+								uuid            : uuid,
+								'is-human'      : false,
+								format          : 'mp3',
 							}
+
+							const fileIdWithoutDuration = 'audio_file.mp3?' + [
+									 'narrator-id=' + itemData['narrator-id'],
+													'uuid=' + itemData.uuid,
+											'is-human=' + itemData['is-human'],
+												'format=' + itemData.format
+								].join('&');
+
+								itemData['fileIdWithoutDuration'] = fileIdWithoutDuration;
 
 							let contentForReading = formatContentForReading( itemData );
 							if (i > 3) {
@@ -183,19 +205,13 @@ function generatePodcast(rssUrl){
 							.then( mp3Buffer => {
 
 								let itemDataWithMp3 = Object.assign({}, itemData, {
-									duration      : 10, // <-- NB this needs to be calculated
-									uuid          : uuid,
-									'is-human'    : false,
-									format        : 'mp3',
+									duration      : 60, // <-- NB this needs to be calculated
 									mp3Buffer     : mp3Buffer
 								});
 
-								const fileId = 'audio_file.mp3?' + [
-										    'duration=' + itemDataWithMp3.duration,
-									   'narrator-id=' + itemDataWithMp3['narrator-id'],
-									          'uuid=' + itemDataWithMp3.uuid,
-										    'is-human=' + itemDataWithMp3['is-human'],
-										      'format=' + itemDataWithMp3.format
+								const fileId = [
+									itemDataWithMp3.fileIdWithoutDuration,
+									'duration=' + itemDataWithMp3.duration
 									].join('&');
 
 								itemDataWithMp3['fileId'] = fileId;
