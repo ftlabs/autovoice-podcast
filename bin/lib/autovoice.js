@@ -7,6 +7,7 @@ const extractUuid  = require('./extract-uuid');
 const parseRSSFeed = require('./parse-rss-feed');
 const tts          = require('./get-tts');
 const reformat     = require('./reformat');
+const dataItemsCache = require('./dataItemsCache');
 
 const SERVER_ROOT   = process.env.SERVER_ROOT;
 if (! SERVER_ROOT ) {
@@ -14,43 +15,6 @@ if (! SERVER_ROOT ) {
 }
 
 const MP3_PATH = '/audio.mp3';
-
-/////////////////////////////////////////////////
-//------ cache of Audio ItemData structs-------//
-const audioItemCache = {}; // mapping fileIdWithoutDuration to itemData
-
-function storeAudioItemData( itemData ) {
-	if( itemData && itemData.fileIdWithoutDuration ) {
-		audioItemCache[ itemData.fileIdWithoutDuration ] = itemData;
-		return itemData.fileIdWithoutDuration;
-	} else {
-		return null;
-	}
-}
-
-function retrieveAudioItemData ( fileId ) {
-	if (! fileId ) {
-		return null;
-	} else { // strip out duration=num, wherever it appears in the fileId
-		const fileIdWithoutDuration = fileId
-			.replace(/\bduration=\d+&?\b/, '')
-			.replace(/&$/, '');
-
-		debug(`retrieveAudioItemData: fileId=${fileId}, fileIdWithoutDuration=${fileIdWithoutDuration}`);
-
-		if (! audioItemCache[fileIdWithoutDuration] ) {
-			return null;
-		} else {
-			return audioItemCache[fileIdWithoutDuration];
-		}
-	}
-}
-
-function audioItemDataKeys() {
-	return Object.keys(audioItemCache);
-}
-
-//------eof cache--------
 
 function cdataifyElement(element, text){
 	return `<${element}><![CDATA[${text}]]></${element}>`;
@@ -218,7 +182,7 @@ function generatePodcast(rssUrl){
 
 								debug('generatePodcast: post tts.mp3 item [ ' + itemDataWithMp3.processingIndex + ' ] mp3Buffer.length=' + mp3Buffer.length );
 
-								storeAudioItemData(itemDataWithMp3);
+								dataItemsCache.store(itemDataWithMp3);
 
 								return itemDataWithMp3;
 							});
@@ -244,8 +208,7 @@ function generatePodcast(rssUrl){
 	}
 
 function getMp3(fileId){
-	// debug('getMp3: keys in cache: ', audioItemDataKeys().join(",\n"));
-	const itemData = retrieveAudioItemData(fileId);
+	const itemData = dataItemsCache.retrieve(fileId);
 	if ( itemData ) {
 			return Promise.resolve( itemData['mp3Buffer']);
 	} else {
