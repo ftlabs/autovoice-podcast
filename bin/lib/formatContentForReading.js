@@ -5,7 +5,7 @@ const reformat     = require('./reformat');
 const     ffIntroRegexp = new RegExp('<span[^>]+>Sign up to receive FirstFT by email <a[^>]+>here<\/a>');
 const speechMarksRegexp = new RegExp('"', "g");
 const    newlinesRegexp = new RegExp('\\n(\\n)+', "g");
-
+ 
 module.exports = function(itemData) {
 	let texts = [
 		`This article is narrated by ${itemData['narrator-id']}, as part of an ongoing experiment with artificial voices.`,
