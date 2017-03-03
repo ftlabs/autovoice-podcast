@@ -1,4 +1,4 @@
-const debug = require('debug')('autovoice:get-tts');
+const debug = require('debug')('autovoice:dataItemsCache');
 
 /////////////////////////////////////////////////
 //------ cache of Audio ItemData structs-------//
