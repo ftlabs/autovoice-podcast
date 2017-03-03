@@ -1,14 +1,22 @@
 const     debug = require('debug')('bin:lib:formatContentForReading');
 const striptags = require('striptags');
 
-const     ffIntroRegexp = new RegExp('<span[^>]+>Sign up to receive FirstFT by email <a[^>]+>here<\/a>');
-const speechMarksRegexp = new RegExp('"', "g");
-const    newlinesRegexp = new RegExp('\\n(\\n)+', "g");
+const ACRONYMS = [
+	'BBC',
+	'EU',
+	'FT',
+	'ICE',
+	'IMF',
+	'LSE',
+	'MTS',
+	'NAR',
+	'UK',
+	'US',
+	'WPP',
+	'WTO',
+];
 
-function reformat(text){
-	text = text.replace(/<p[^>]*>/g, '\n').replace(/<\/p[^>]*>/g, '\n');
-	return striptags(text);
-}
+const ACRONYMS_REGEXP = '\b(' + ACRONYMS.join('|') + ')\b';
 
 module.exports = function(itemData) {
 	let texts = [
@@ -23,14 +31,16 @@ module.exports = function(itemData) {
 	// <span class="ft-bold">Sign up to receive FirstFT by email
 	// <a title="FirstFT" href="http://nbe.ft.com/nbe/profile.cfm?firstft=Y">here</a> </span>
 
-	if (itemData.content.match(ffIntroRegexp)) {
-		debug(`formatContentForReading: matched ffIntroRegexp in article w/title=${itemData.title}`);
-	}
+	let content = itemData.content
+	.replace(/<span[^>]+>Sign up to receive FirstFT by email <a[^>]+>here<\/a>/g, '')
+	.replace(/<p[^>]*>/g, '\n')
+	.replace(/<\/p[^>]*>/g, '\n')
+	;
 
-	let content = itemData.content.replace(ffIntroRegexp, "");
-	content = reformat( content );
-	content = content.replace(speechMarksRegexp, "\'");
-	content = content.replace(newlinesRegexp, '\n');
+	content = striptags( content )
+	.replace(/"/g, "\'")
+	.replace(/\\n(\\n)+/g, '\n')
+	;
 
 	// also parse/rewrite some of the firstFT-specific text e.g. the attributions in brackets
 
