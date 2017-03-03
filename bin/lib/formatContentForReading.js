@@ -1,11 +1,15 @@
-const debug = require('debug')('bin:lib:formatContentForReading');
-
-const reformat     = require('./reformat');
+const debug     = require('debug')('bin:lib:formatContentForReading');
+const striptags = require('striptags');
 
 const     ffIntroRegexp = new RegExp('<span[^>]+>Sign up to receive FirstFT by email <a[^>]+>here<\/a>');
 const speechMarksRegexp = new RegExp('"', "g");
 const    newlinesRegexp = new RegExp('\\n(\\n)+', "g");
- 
+
+function reformat(text){
+	text = text.replace(/<p[^>]*>/g, '\n').replace(/<\/p[^>]*>/g, '\n');
+	return striptags(text);
+}
+
 module.exports = function(itemData) {
 	let texts = [
 		`This article is narrated by ${itemData['narrator-id']}, as part of an ongoing experiment with artificial voices.`,
