@@ -14,8 +14,11 @@ const ACRONYMS = [
 	'MTS',
 	'NAR',
 	'NYSE',
+	'NYT',
 	'UK',
 	'US',
+	'WaPo',
+	'WAPO',
 	'WPP',
 	'WTO'
 ];
@@ -52,8 +55,13 @@ function processText(rawContent) {
 	.replace(/\n+/g, ' ')        // convert newlines
 	.replace(/\.(\s*\.)+/g, '.') // compress multi dot and space combos
 	.replace(/\s+/g, ' ')        // compress multiple spaces
+	;
 
-	.replace(REMOVALS_REGEXP, ' ');
+	if (content.match(/Sign up to receive FirstFT/)) {
+		content = content.replace(/\.\s+\(([a-zA-Z, ]+)\)/g, (match, p1) => { return `. (as reported by ${p1}). `; });
+	}
+
+	content = content.replace(REMOVALS_REGEXP, ' ');
 
 	for( let rpp of REPLACEMENT_PATTERN_PAIRS ) {
 		content = content.replace( rpp[0], rpp[1] );
@@ -61,6 +69,7 @@ function processText(rawContent) {
 
 	content = content
 	.replace(ACRONYMS_REGEXP, match => { return match.split('').join(' ') })
+	.replace(/ (\d+(?:\.\d+)?)m /g, (match, p1) => { return ` ${p1} million `})
 
 	.replace(/(\s*\.)+/g, '.') // compress dot and space combos
 	.replace(/\s+/g, ' ')      // compress multiple spaces
@@ -73,7 +82,7 @@ function processText(rawContent) {
 function wrap(itemData) {
 
 	let texts = [
-		`This article is narrated by ${itemData['narrator-id']}, as part of an ongoing experiment with artificial voices.`,
+		`This article is narrated by ${itemData['narrator-id']}, as part of an on-going experiment with artificial voices.`,
 		`This article is titled: ${itemData.title}.`
 	];
 
