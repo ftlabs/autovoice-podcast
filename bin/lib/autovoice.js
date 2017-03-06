@@ -66,7 +66,7 @@ function generatePodcast(rssUrl){
 
 								itemData['fileIdWithoutDuration'] = fileIdWithoutDuration;
 
-							let contentForReading = formatContentForReading.wrapped( itemData );
+							let contentForReading = formatContentForReading.wrapAndProcessItemData( itemData );
 							if (i > 3) {
 								debug('generatePodcast: setting contentForReading=""');
 								contentForReading = "";
