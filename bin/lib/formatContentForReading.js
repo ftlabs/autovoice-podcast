@@ -57,7 +57,9 @@ function processText(rawContent) {
 	;
 
 	if (content.match(/Sign up to receive FirstFT/)) {
-		content = content.replace(/\.\s+\(([a-zA-Z, ]+)\)/g, (match, p1) => { return `. (as reported by ${p1}). `; });
+		debug('processText: identified a FirstFT article...');
+		content = content.replace(/\.\s+\(([a-zA-Z ]+)\)/g, (match, p1) => { return `. (as reported by ${p1}). `; });
+		content = content.replace(/\.\s+\(([a-zA-Z, ]+)\s*,\s*([a-zA-Z ]+)\)/g, (match, p1, p2) => { return `. (as reported by ${p1}, and ${p2}). `; });
 	}
 
 	content = content.replace(REMOVALS_REGEXP, ' ');
@@ -82,7 +84,7 @@ function wrap(itemData) {
 
 	let texts = [
 		`This article is narrated by ${itemData.voiceId}, as part of an on-going experiment with artificial voices.`,
-		`This article is titled: ${itemData.title}.`
+		`This article is titled: "${itemData.title}".`
 	];
 
 	if (itemData.author) {
