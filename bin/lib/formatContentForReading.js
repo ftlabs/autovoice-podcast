@@ -81,7 +81,7 @@ function processText(rawContent) {
 function wrap(itemData) {
 
 	let texts = [
-		`This article is narrated by ${itemData['narrator-id']}, as part of an on-going experiment with artificial voices.`,
+		`This article is narrated by ${itemData.voiceId}, as part of an on-going experiment with artificial voices.`,
 		`This article is titled: ${itemData.title}.`
 	];
 
@@ -100,7 +100,7 @@ function wrap(itemData) {
 		texts.push(`This article was written by ${itemData.author}.`);
 	}
 
-  texts.push(`This article was narrated by ${itemData['narrator-id']}, as part of an ongoing experiment with artificial voices.`);
+  texts.push(`This article was narrated by ${itemData.voiceId}, as part of an ongoing experiment with artificial voices.`);
 
 	return texts.join("\n");
 }

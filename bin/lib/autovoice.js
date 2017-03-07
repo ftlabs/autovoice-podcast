@@ -9,8 +9,8 @@ const          dataItemsCache = require('./dataItemsCache');
 const            constructRSS = require('./constructRSS');
 const formatContentForReading = require('./formatContentForReading');
 
-function generatePodcast(rssUrl){
-	debug('generatePodcast: rssUrl=', rssUrl);
+function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
+	debug(`generatePodcast: rssUrl=${rssUrl}, voiceId=${voiceId}`);
 
 	// fetch the full rss feed
 	// loop over each item
@@ -46,12 +46,11 @@ function generatePodcast(rssUrl){
 							var itemData = {
 								rssUrl  : rssUrl,
 								content : item.description[0],
-								voiceId : tts.defaultVoiceId,
+								voiceId : voiceId,
 								title   : item.title[0],
 								guid    : guid,
 								pubdate : item.pubDate[0], // <-- NB this should be the now time,
 						    author  : item.author[0],
-								'narrator-id' : tts.defaultVoiceId,
 								processingIndex : i,
 								uuid            : uuid,
 								'is-human'      : false,
@@ -67,7 +66,7 @@ function generatePodcast(rssUrl){
 							itemData['contentForReadingHashCode'] = md5(contentForReading);
 
 							const fileIdWithoutDuration = 'audio_file.mp3?' + [
-									 'narrator-id=' + itemData['narrator-id'],
+									 'narrator-id=' + itemData.voiceId,
 													'uuid=' + itemData.uuid,
 											'is-human=' + itemData['is-human'],
 												'format=' + itemData.format,
@@ -84,7 +83,7 @@ function generatePodcast(rssUrl){
 								debug('generatePodcast: item not cached, so about to TTS, title=', item.title[0], ', voiceId=', itemData.voiceId);
 							}
 
-							return tts.mp3( itemData['contentForReading'], itemData['narrator-id'] )
+							return tts.mp3( itemData['contentForReading'], itemData.voiceId )
 							.then( mp3Buffer => {
 
 								let itemDataWithMp3 = Object.assign({}, itemData, {
@@ -151,7 +150,7 @@ function getSnippetMp3(snippet, voiceId){
 
 			let itemDataWithMp3 = {
 				mp3Buffer     : mp3Buffer,
-				'narrator-id' : voiceId,
+				voiceId       : voiceId,
 				content       : snippet,
 				contentForReading : snippetForReading,
 				fileId        : fileId,
