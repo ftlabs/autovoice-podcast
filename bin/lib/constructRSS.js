@@ -8,6 +8,32 @@ if (! SERVER_ROOT ) {
 
 const MP3_PATH = '/audio.mp3';
 
+/**
+ * Get an RSS pubDate from a Javascript Date instance.
+ * @param Date - optional
+ * @return String
+ */
+function pubDate(date) {
+
+  if (typeof date === 'undefined') {
+    date = new Date();
+  }
+
+  var pieces     = date.toString().split(' '),
+      offsetTime = pieces[5].match(/[-+]\d{4}/),
+      offset     = (offsetTime) ? offsetTime : pieces[5],
+      parts      = [
+        pieces[0] + ',',
+        pieces[2],
+        pieces[1],
+        pieces[3],
+        pieces[4],
+        offset
+      ];
+
+  return parts.join(' ');
+}
+
 function cdataifyElement(element, text){
 	return `<${element}><![CDATA[${text}]]></${element}>`;
 }
@@ -23,8 +49,8 @@ module.exports = function(rssUrl, items) {
 			cdataifyElement('generator', 'FT Labs autovoice-podcast'),
 			cdataifyElement('docs', 'http://blogs.law.harvard.edu/tech/rss'),
 			cdataifyElement('language', 'en'),
-			cdataifyElement('pubDate', 'Thu, 01 Jan 1970 00:00:01 +0000'),
-			cdataifyElement('lastBuildDate', 'Thu, 01 Jan 1970 00:00:01 +0000'),
+			cdataifyElement('pubDate', pubDate() ),
+			cdataifyElement('lastBuildDate', pubDate() ),
 	    `<atom:link href="https://example.com/rss.xml" rel="self" type="application/rss+xml"/>`,
 	];
 

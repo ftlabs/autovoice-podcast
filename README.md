@@ -22,3 +22,5 @@ When supplied an RSS feed of articles (where the article body is in the <descrip
 * /snippet.mp3?text=some words to be processed and spoken&voice=voiceId
    * returns MP3 content
    * to pass a fragment of text through the pre-processor and then to TTS to test changes to the pre-processing
+* /static/snippet.html
+   * a form which invokes the /snippet.mp3 endpoint
