@@ -126,7 +126,39 @@ function getMp3(fileId){
 	}
 }
 
+function getSnippetMp3(snippet, voiceId){
+	debug('getSnippetMp3: snippet=', snippet, ', voiceId=', voiceId);
+
+	const fileId = snippet + voiceId;
+	const itemData = dataItemsCache.retrieve(fileId);
+	if ( itemData ) {
+			return Promise.resolve( itemData['mp3Buffer']);
+	} else {
+		const snippetForReading = formatContentForReading.processText( snippet );
+		debug('getSnippetMp3: snippetForReading=', snippetForReading);
+
+		return tts.mp3( snippetForReading, voiceId )
+		.then( mp3Buffer => {
+
+			let itemDataWithMp3 = {
+				mp3Buffer     : mp3Buffer,
+				'narrator-id' : voiceId,
+				content       : snippet,
+				contentForReading : snippetForReading,
+				fileId        : fileId,
+				fileIdWithoutDuration: fileId,
+			};
+
+			dataItemsCache.store(itemDataWithMp3);
+
+			return itemDataWithMp3.mp3Buffer;
+		})
+		;
+	}
+}
+
 module.exports = {
 	podcast : generatePodcast,
-	mp3     : getMp3
+	mp3     : getMp3,
+	snippetMp3 : getSnippetMp3
 };

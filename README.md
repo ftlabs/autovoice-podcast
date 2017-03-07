@@ -14,3 +14,11 @@ When supplied an RSS feed of articles (where the article body is in the <descrip
    * return full podcast feed, including refs to mp3 files
 * /mp3?id=ID_OF_MP3_CONTENT
    * returns MP3 content
+   * ID_OF_MP3_CONTENT would come from the output of /podcast
+   * this requires the /podcast endpoint to have been invoked first
+* /format?text=some words to be processed
+   * returns processed text
+   * just to show how the text is munged before being passed to TTS
+* /snippet.mp3?text=some words to be processed and spoken&voice=voiceId
+   * returns MP3 content
+   * to pass a fragment of text through the pre-processor and then to TTS to test changes to the pre-processing

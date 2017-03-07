@@ -34,7 +34,8 @@ app.get('/podcast', (req, res) => {
 
 app.get('/audio.mp3', (req, res) => {
   const id = req.query.id;
-  const mp3Content = autovoice.mp3(id)
+
+  autovoice.mp3(id)
   .then(mp3Content => {
     debug('mp3Content=', mp3Content);
     res.set('Content-Type', 'audio/mpeg');
@@ -49,6 +50,17 @@ app.get('/format', (req, res) => {
   res.send(`${text}\n------\n${formattedText}`);
 });
 
+app.get('/snippet.mp3', (req, res) => {
+  const text = req.query.text;
+  const voice   = req.query.voice;
+
+  autovoice.snippetMp3(text, voice)
+  .then(mp3Content => {
+    debug('mp3Content=', mp3Content);
+    res.set('Content-Type', 'audio/mpeg');
+    res.send(mp3Content);
+  })
+});
 
 app.listen(process.env.PORT, function(){
 	debug('Server is listening on port', process.env.PORT);
