@@ -83,7 +83,7 @@ function processText(rawContent) {
 function wrap(itemData) {
 
 	let texts = [
-		`This article is narrated by ${itemData.voiceId}, as part of an on-going experiment with artificial voices.`,
+		`This article is narrated by ${itemData.voiceId}, as part of an on-going FT Labs experiment with artificial voices.`,
 		`This article is titled: "${itemData.title}".`
 	];
 
