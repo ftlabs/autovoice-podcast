@@ -66,7 +66,7 @@ function getMp3(content, voiceId){
 		};
 		const bodyObjJson = JSON.stringify( bodyObj );
 
-		debug('getMp3: url=' + url + "\nbody=" + bodyObjJson);
+		debug('getMp3: TTS_URL=' + TTS_URL + "\nbody=" + bodyObjJson);
 
 		return fetch(url, {
 			method  : 'POST',

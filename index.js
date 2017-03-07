@@ -37,7 +37,6 @@ app.get('/audio.mp3', (req, res) => {
 
   autovoice.mp3(id)
   .then(mp3Content => {
-    debug('mp3Content=', mp3Content);
     res.set('Content-Type', 'audio/mpeg');
     res.send(mp3Content);
   })
@@ -56,7 +55,6 @@ app.get('/snippet.mp3', (req, res) => {
 
   autovoice.snippetMp3(text, voice)
   .then(mp3Content => {
-    debug('mp3Content=', mp3Content);
     res.set('Content-Type', 'audio/mpeg');
     res.send(mp3Content);
   })

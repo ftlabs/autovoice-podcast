@@ -36,7 +36,7 @@ debug(`REMOVALS_REGEXP=${REMOVALS_REGEXP}`);
 const REPLACEMENT_PAIRS = [
 	['per cent', 'percent'],
 	['N Korea',  'North Korea'],
-	['WaPo',     'Wa Po']
+	['WaPo',     'wa po']
 ];
 const REPLACEMENT_PATTERN_PAIRS = REPLACEMENT_PAIRS.map(
 	r => { return [new RegExp(`\\b${r[0]}\\b`, 'ig'), r[1]]; }
