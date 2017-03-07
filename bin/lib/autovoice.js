@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const md5   = require('md5');
 const debug = require('debug')('autovoice:lib');
 
 const             extractUuid = require('./extract-uuid');
@@ -9,7 +10,7 @@ const            constructRSS = require('./constructRSS');
 const formatContentForReading = require('./formatContentForReading');
 
 function generatePodcast(rssUrl){
-	debug('rssUrl=', rssUrl);
+	debug('generatePodcast: rssUrl=', rssUrl);
 
 	// fetch the full rss feed
 	// loop over each item
@@ -24,11 +25,11 @@ function generatePodcast(rssUrl){
 		.then(res  => res.text())
 		.then(text => parseRSSFeed(text))
 		.then(feed => {
-			debug('feed=', feed);
+			debug('generatePodcast: feed=', feed);
 
 			const promises = feed.channel[0].item.map((item, i)=> {
 				const guid = item['guid'][0];
-				debug('rss item[', i, '] guid=', guid);
+				debug('generatePodcast: rss item[', i, '] guid=', guid);
 
 				const uuid = extractUuid( guid );
 
@@ -37,7 +38,7 @@ function generatePodcast(rssUrl){
 				} else {
 					return Promise.resolve( uuid )
 						.then(uuid => {
-							debug('promise item[', i, '] uuid=', uuid);
+							debug('generatePodcast: promise item[', i, '] uuid=', uuid);
 							if(uuid === undefined){
 								return false;
 							}
@@ -57,23 +58,31 @@ function generatePodcast(rssUrl){
 								format          : 'mp3',
 							}
 
+							let contentForReading = formatContentForReading.wrapAndProcessItemData( itemData );
+							if (i > 3) {
+								debug('generatePodcast: generatePodcast: setting contentForReading=""');
+								contentForReading = "";
+							}
+							itemData['contentForReading']         = contentForReading;
+							itemData['contentForReadingHashCode'] = md5(contentForReading);
+
 							const fileIdWithoutDuration = 'audio_file.mp3?' + [
 									 'narrator-id=' + itemData['narrator-id'],
 													'uuid=' + itemData.uuid,
 											'is-human=' + itemData['is-human'],
-												'format=' + itemData.format
+												'format=' + itemData.format,
+												'hashcode=' + itemData.contentForReadingHashCode,
 								].join('&');
 
-								itemData['fileIdWithoutDuration'] = fileIdWithoutDuration;
+							itemData['fileIdWithoutDuration'] = fileIdWithoutDuration;
 
-							let contentForReading = formatContentForReading.wrapAndProcessItemData( itemData );
-							if (i > 3) {
-								debug('generatePodcast: setting contentForReading=""');
-								contentForReading = "";
+							const cachedItemDataWithMp3 = dataItemsCache.retrieve(fileIdWithoutDuration);
+							if (cachedItemDataWithMp3) {
+								debug('generatePodcast: retrieved from cache: title=', item.title[0], ', voiceId=', itemData.voiceId);
+								return cachedItemDataWithMp3;
+							} else {
+								debug('generatePodcast: item not cached, so about to TTS, title=', item.title[0], ', voiceId=', itemData.voiceId);
 							}
-							itemData['contentForReading'] = contentForReading;
-
-							debug('about to TTS, title=', item.title[0], ', voiceId=', itemData.voiceId);
 
 							return tts.mp3( itemData['contentForReading'], itemData['narrator-id'] )
 							.then( mp3Buffer => {
