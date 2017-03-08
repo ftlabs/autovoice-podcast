@@ -42,7 +42,7 @@ const britishVoiceIds = [
 	'Emma',
 ];
 
-const defaultVoiceId = 'Emma';
+const defaultVoiceId = 'Amy';
 const defaultMp3File = 'static/audio/test.mp3';
 
 function getMp3(content, voiceId){
