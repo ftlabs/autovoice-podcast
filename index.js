@@ -1,6 +1,7 @@
 const dotenv = require('dotenv').config();
 const debug = require('debug')('autovoice:index');
 const express = require('express');
+const path = require('path');
 const app = express();
 
 const autovoice = require('./bin/lib/autovoice');
@@ -16,7 +17,7 @@ app.use(requestLogger);
 app.use('/static', express.static('static'));
 
 app.get('/', (req, res) => {
-	res.status(200).end();
+	res.sendFile(path.join(__dirname + '/static/index.html'));
 });
 
 app.get('/__gtg', (req, res) => {
