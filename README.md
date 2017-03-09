@@ -1,12 +1,15 @@
 # FT Labs Generates Automated Voices For RSS Feed of Articles
 
-When supplied an RSS feed of articles (where the article body is in the <description>)
+Basic gist:
 
-* pick a voice
-* define a map from id to TTS spec
-* pass each article to the TTS service to have the mp3 generated (and cached)
-* construct the full podcast rss feed referencing the mp3 id,
-   * so that when the podcast is consumed, the request will come to this service for the mp3 file, and it in turn will collect it from the TTS service cache (or local cache)
+* convert a full-text RSS feed into a podcast, for subsequent ingestion into the audio-articles system
+
+More details
+
+* from the input RSS feed, each item's description element is processed to knock it into a shape that will then be better narrated by the TextToSpeech engine, e.g. removing HTML tags, splitting some otherwise-mis-pronounced acronyms such as CEO into separate letters, etc
+* the auto-generated MP3 files are cached in-memory, based on a persistent identifier including the hash code of the processed description text, the chosen voice
+   * a caveat is that if the service reboots, the MP3 url will not work until the source RSS feed has been re-processed. This was deemed ok since the intended use case for this service involves immediate consumption of the MP3 files once they have been generated as part of the podcast.
+* there are assorted other endpoints for exposing some of the text processing and generating raw snippets of MP3 for fragments of text.
 
 # new end points
 
@@ -17,10 +20,22 @@ When supplied an RSS feed of articles (where the article body is in the <descrip
    * ID_OF_MP3_CONTENT would come from the output of /podcast
    * this requires the /podcast endpoint to have been invoked first
 * /format?text=some words to be processed
+   * optional, &compare=yes (default=no)
    * returns processed text
-   * just to show how the text is munged before being passed to TTS
+   * to show how the text is munged before being passed to TTS
+* /static/format.html
+   * a form which invokes the /format endpoint
 * /snippet.mp3?text=some words to be processed and spoken&voice=voiceId
    * returns MP3 content
    * to pass a fragment of text through the pre-processor and then to TTS to test changes to the pre-processing
 * /static/snippet.html
    * a form which invokes the /snippet.mp3 endpoint
+
+# Environment Parameters
+
+* DEBUG=autovoice:\*,bin:lib:\*
+* TTS_URL=URL_OF_THE_TEXT_TO_SPEECH_SERVICE
+* TTS_TOKEN=...
+* SERVER_ROOT=TRANSPORT_AND_DOMAIN_OF_SERVICE
+   * to use when constructing the podcast feed
+   * e.g. when developing locally, http://localhost:8060

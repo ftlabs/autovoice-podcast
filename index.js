@@ -44,10 +44,15 @@ app.get('/audio.mp3', (req, res) => {
 });
 
 app.get('/format', (req, res) => {
+  const compare = req.query.compare;
   const text = req.query.text;
   const formattedText = formatContentForReading.processText(text);
   res.set('Content-Type', 'text/plain');
-  res.send(`${text}\n------\n${formattedText}`);
+  let body = formattedText;
+  if (compare === "yes") {
+    body = `${text}\n------\n${body}`;
+  }
+  res.send(body);
 });
 
 app.get('/snippet.mp3', (req, res) => {
