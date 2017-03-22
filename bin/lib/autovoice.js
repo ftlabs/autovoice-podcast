@@ -65,12 +65,12 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 							itemData['contentForReading']         = contentForReading;
 							itemData['contentForReadingHashCode'] = md5(contentForReading);
 
-							const fileIdWithoutDuration = 'audio_file.mp3?' + [
+							const fileIdWithoutDuration = [
 									 'narrator-id=' + itemData.voiceId,
 													'uuid=' + itemData.uuid,
 											'is-human=' + itemData['is-human'],
 												'format=' + itemData.format,
-												'hashcode=' + itemData.contentForReadingHashCode,
+											'hashcode=' + itemData.contentForReadingHashCode,
 								].join('&');
 
 							itemData['fileIdWithoutDuration'] = fileIdWithoutDuration;

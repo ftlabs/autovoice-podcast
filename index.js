@@ -35,8 +35,7 @@ app.get('/podcast', (req, res) => {
 });
 
 app.get('/audio.mp3', (req, res) => {
-  const id = req.query.id;
-
+  const id = req.url.split('?')[1];
   autovoice.mp3(id)
   .then(mp3Content => {
     res.set('Content-Type', 'audio/mpeg');
