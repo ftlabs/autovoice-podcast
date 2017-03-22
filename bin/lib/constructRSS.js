@@ -9,11 +9,11 @@ if (! SERVER_ROOT ) {
 const MP3_PATH = '/audio.mp3';
 
 /**
- * Get an RSS pubDate from a Javascript Date instance.
+ * Get an RSS pubdate from a Javascript Date instance.
  * @param Date - optional
  * @return String
  */
-function pubDate(date) {
+function pubdate(date) {
 
   if (typeof date === 'undefined') {
     date = new Date();
@@ -49,8 +49,8 @@ module.exports = function(rssUrl, items) {
 			cdataifyElement('generator', 'FT Labs autovoice-podcast'),
 			cdataifyElement('docs', 'http://blogs.law.harvard.edu/tech/rss'),
 			cdataifyElement('language', 'en'),
-			cdataifyElement('pubDate', pubDate() ),
-			cdataifyElement('lastBuildDate', pubDate() ),
+			cdataifyElement('pubdate', pubdate() ),
+			cdataifyElement('lastBuildDate', pubdate() ),
 	    `<atom:link href="https://example.com/rss.xml" rel="self" type="application/rss+xml"/>`,
 	];
 
@@ -61,7 +61,7 @@ module.exports = function(rssUrl, items) {
 					cdataifyElement('title', item.title),
 					cdataifyElement('link', SERVER_ROOT + '/audio.mp3?' + item.fileId),
 					cdataifyElement('description', 'deliberately left blank'),
-					cdataifyElement('pubDate', item.pubdate),
+					cdataifyElement('pubdate', item.pubdate),
 					`<guid isPermaLink="true">![CDATA[ ${item.guid} ]]</guid>`,
 				`</item>`,
 			]);
