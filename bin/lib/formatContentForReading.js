@@ -36,7 +36,9 @@ debug(`REMOVALS_REGEXP=${REMOVALS_REGEXP}`);
 const REPLACEMENT_PAIRS = [
 	['per cent', 'percent'],
 	['N Korea',  'North Korea'],
-	['WaPo',     'wa po']
+	['WaPo',     'wa po'],
+	['S&amp;P',  'S and P'],
+	['Donald Trump', 'Donald Trump,'],
 ];
 const REPLACEMENT_PATTERN_PAIRS = REPLACEMENT_PAIRS.map(
 	r => { return [new RegExp(`\\b${r[0]}\\b`, 'ig'), r[1]]; }
@@ -82,27 +84,16 @@ function processText(rawContent) {
 
 function wrap(itemData) {
 
-	let texts = [
-		`This article is narrated by ${itemData.voiceId}, as part of an on-going FT Labs experiment with artificial voices.`,
-		`This article is titled: "${itemData.title}".`
-	];
+	let texts = [];
 
-	if (itemData.author) {
-		const author = itemData.author
-		.replace(/\s*[bB]y\s+/, '')
-		.replace(/\s+and\s*$/i, '')
-		.replace(/,([^,]+)$/, (match, p1) => { return ` and ${p1}. `})
-		texts.push(`This article was written by ${author}.`);
-	}
-
+	texts.push(`This article is narrated by Experimental ${itemData.voiceId}.`);
 	texts.push( itemData.content + '.' );
 
 	texts.push(`This article was titled ${itemData.title}.`);
 	if (itemData.author) {
 		texts.push(`This article was written by ${itemData.author}.`);
 	}
-
-  texts.push(`This article was narrated by ${itemData.voiceId}, as part of an ongoing experiment with artificial voices.`);
+  texts.push(`This article was narrated by ${itemData.voiceId}, as part of an ongoing FT Labs experiment with artificial voices.`);
 
 	return texts.join("\n");
 }
