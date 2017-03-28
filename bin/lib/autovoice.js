@@ -12,6 +12,16 @@ const formatContentForReading = require('./formatContentForReading');
 function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 	debug(`generatePodcast: rssUrl=${rssUrl}, voiceId=${voiceId}`);
 
+	let isAlwaysNotHuman = true;
+
+	{
+		let match = /(\w+)-canBeHuman/i.exec(voiceId);
+		if (match) {
+			voiceId = match[1];
+			isAlwaysNotHuman = false;			
+		}
+	}
+
 	// fetch the full rss feed
 	// loop over each item
 	// - establish if refers to an article with a valid uuid (return null if not)
@@ -43,6 +53,12 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 								return false;
 							}
 
+							// Set is-human to be false except when the voiceId included -canBeHuman and it is the first item.
+							// AKA, if the voiceId included -canBeHuman, set the first item to have is-human=true,
+							// otherwise always set is-human=false.
+
+							let isHuman = (isAlwaysNotHuman || i>0)? false : true;
+
 							var itemData = {
 								rssUrl  : rssUrl,
 								content : item.description[0],
@@ -53,7 +69,7 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 						    author  : item.author[0],
 								processingIndex : i,
 								uuid            : uuid,
-								'is-human'      : false,
+								'is-human'      : isHuman,
 								format          : 'mp3',
 							}
 
