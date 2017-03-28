@@ -66,7 +66,7 @@ module.exports = function(rssUrl, items) {
 					cdatifyElement('link', SERVER_ROOT + '/audio.mp3?' + item.fileId),
 					element('description', 'deliberately left blank'),
 					element('pubDate', item.pubdate),
-					`<guid isPermaLink="true">${item.guid}</guid>`,
+					`<guid isPermaLink="true"><![CDATA[${item.guid}]]></guid>`,
 				`</item>`,
 			]);
 		}
