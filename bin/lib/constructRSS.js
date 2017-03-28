@@ -34,8 +34,12 @@ function pubdate(date) {
   return parts.join(' ');
 }
 
-function cdataifyElement(element, text){
+function cdatifyElement(element, text){
 	return `<${element}><![CDATA[${text}]]></${element}>`;
+}
+
+function element(element, text){
+	return `<${element}>${text}</${element}>`;
 }
 
 module.exports = function(rssUrl, items) {
@@ -43,14 +47,14 @@ module.exports = function(rssUrl, items) {
 	let lines = [
 		`<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">`,
     `<channel>`,
-			cdataifyElement('title', 'Automated Voices'),
-			cdataifyElement('link', rssUrl),
-			cdataifyElement('description', 'A Podcast/RSS feed of automated voices of FT articles, based on an RSS feed of article content'),
-			cdataifyElement('generator', 'FT Labs autovoice-podcast'),
-			cdataifyElement('docs', 'http://blogs.law.harvard.edu/tech/rss'),
-			cdataifyElement('language', 'en'),
-			cdataifyElement('pubdate', pubdate() ),
-			cdataifyElement('lastBuildDate', pubdate() ),
+			element('title', 'Automated Voices'),
+			element('link', rssUrl),
+			element('description', 'A Podcast/RSS feed of automated voices of FT articles, based on an RSS feed of article content'),
+			element('generator', 'FT Labs autovoice-podcast'),
+			element('docs', 'http://blogs.law.harvard.edu/tech/rss'),
+			element('language', 'en'),
+			element('pubDate', pubdate() ),
+			element('lastBuildDate', pubdate() ),
 	    `<atom:link href="https://example.com/rss.xml" rel="self" type="application/rss+xml"/>`,
 	];
 
@@ -58,11 +62,11 @@ module.exports = function(rssUrl, items) {
 		if (item) {
 			lines = lines.concat([
 				`<item>`,
-					cdataifyElement('title', item.title),
-					cdataifyElement('link', SERVER_ROOT + '/audio.mp3?' + item.fileId),
-					cdataifyElement('description', 'deliberately left blank'),
-					cdataifyElement('pubdate', item.pubdate),
-					`<guid isPermaLink="true">![CDATA[ ${item.guid} ]]</guid>`,
+					element('title', item.title),
+					cdatifyElement('link', SERVER_ROOT + '/audio.mp3?' + item.fileId),
+					element('description', 'deliberately left blank'),
+					element('pubDate', item.pubdate),
+					`<guid isPermaLink="true">${item.guid}</guid>`,
 				`</item>`,
 			]);
 		}
