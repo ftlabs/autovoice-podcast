@@ -18,7 +18,7 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 		let match = /(\w+)-canBeHuman/i.exec(voiceId);
 		if (match) {
 			voiceId = match[1];
-			isAlwaysNotHuman = false;			
+			isAlwaysNotHuman = false;
 		}
 	}
 
@@ -74,10 +74,10 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 							}
 
 							let contentForReading = formatContentForReading.wrapAndProcessItemData( itemData );
-							if (i > 3) {
-								debug('generatePodcast: generatePodcast: setting contentForReading=""');
-								contentForReading = "";
-							}
+							// if (i > 3) {
+							// 	debug('generatePodcast: generatePodcast: setting contentForReading=""');
+							// 	contentForReading = "";
+							// }
 							itemData['contentForReading']         = contentForReading;
 							itemData['contentForReadingHashCode'] = md5(contentForReading);
 
