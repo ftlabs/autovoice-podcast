@@ -56,8 +56,19 @@ app.get('/format', (req, res) => {
 });
 
 app.get('/snippet.mp3', (req, res) => {
-  const text = req.query.text;
-  const voice   = req.query.voice;
+  let   text  = req.query.text;
+  const voice = req.query.voice;
+  const wrap  = req.query.wrap;
+
+  if (wrap == 'yes') {
+    var itemData = {
+      content : text,
+      voiceId : voice,
+      title   : "A thing happened",
+      author  : "A. N. Author",
+    }
+    text = formatContentForReading.wrapAndProcessItemData(itemData);
+  }
 
   autovoice.snippetMp3(text, voice)
   .then(mp3Content => {
