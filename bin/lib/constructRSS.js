@@ -62,9 +62,9 @@ module.exports = function(rssUrl, items) {
 		if (item) {
 			lines = lines.concat([
 				`<item>`,
-					element('title', item.title),
+					cdatifyElement('title', item.title),
 					cdatifyElement('link', SERVER_ROOT + '/audio.mp3?' + item.fileId),
-					element('description', 'deliberately left blank'),
+					cdatifyElement('description', 'deliberately left blank'),
 					element('pubDate', item.pubdate),
 					`<guid isPermaLink="true"><![CDATA[${item.guid}]]></guid>`,
 				`</item>`,
