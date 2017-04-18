@@ -35,10 +35,17 @@ More details
 
 # Environment Parameters
 
-* DEBUG=autovoice:\*,bin:lib:\*
+When building locally, specify them in a local file, .env (and NB, this must not be included in the git repo, hence has a specific line in .gitignore). When deploying to Heroku, they need to be specified in the app's settings, Config Variables.
+
+The following are mandatory params:
+
 * TTS_URL=URL_OF_THE_TEXT_TO_SPEECH_SERVICE
 * TTS_TOKEN=...
+* PODCAST_TOKEN=... (the absence of this will kill the app on startup)
+
+These are for local builds:
+
 * SERVER_ROOT=TRANSPORT_AND_DOMAIN_OF_SERVICE
    * to use when constructing the podcast feed
    * e.g. when developing locally, http://localhost:8060
-* PODCAST_TOKEN=...
+* DEBUG=autovoice:\*,bin:lib:\*
