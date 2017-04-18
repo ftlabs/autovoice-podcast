@@ -22,7 +22,6 @@ const ACRONYMS = [
 ];
 const ACRONYMS_PATTERN = `\\b(${ACRONYMS.join('|') })\\b`;
 const ACRONYMS_REGEXP  = new RegExp(ACRONYMS_PATTERN, 'g');
-debug(`ACRONYMS_REGEXP=${ACRONYMS_REGEXP}`);
 
 const REMOVALS = [
 	'Sign up to receive FirstFT by email here',
@@ -31,7 +30,6 @@ const REMOVALS = [
 ];
 const REMOVALS_PATTERN = `\\b(${REMOVALS.join('|') })\\b`;
 const REMOVALS_REGEXP = new RegExp(REMOVALS_PATTERN, 'ig');
-debug(`REMOVALS_REGEXP=${REMOVALS_REGEXP}`);
 
 const REPLACEMENT_PAIRS = [
 	['per cent', 'percent'],
@@ -59,7 +57,6 @@ function processText(rawContent) {
 	;
 
 	if (content.match(/Sign up to receive FirstFT/)) {
-		debug('processText: identified a FirstFT article...');
 		content = content.replace(/\.\s+\(([a-zA-Z ]+)\)/g, (match, p1) => { return `. (as reported by ${p1}). `; });
 		content = content.replace(/\.\s+\(([a-zA-Z, ]+)\s*,\s*([a-zA-Z ]+)\)/g, (match, p1, p2) => { return `. (as reported by ${p1}, and ${p2}). `; });
 	}
