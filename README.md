@@ -13,9 +13,11 @@ More details
 
 # new end points
 
-* /podcast?rss=URL_OF_ARTICLE_RSS_FEED
+* /podcast?token=TOKEN&voice=VOICE_ID&rss=URL_OF_ARTICLE_RSS_FEED
    * return full podcast feed, including refs to mp3 files
-* /mp3?id=ID_OF_MP3_CONTENT
+   * VOICE_ID needs to match one of the known voices
+   * TOKEN needs to match the value of env param: PODCAST_TOKEN
+* /audio.mp3?id=ID_OF_MP3_CONTENT
    * returns MP3 content
    * ID_OF_MP3_CONTENT would come from the output of /podcast
    * this requires the /podcast endpoint to have been invoked first
@@ -39,3 +41,4 @@ More details
 * SERVER_ROOT=TRANSPORT_AND_DOMAIN_OF_SERVICE
    * to use when constructing the podcast feed
    * e.g. when developing locally, http://localhost:8060
+* PODCAST_TOKEN=...

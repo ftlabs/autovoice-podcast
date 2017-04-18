@@ -7,6 +7,7 @@ const app = express();
 const autovoice = require('./bin/lib/autovoice');
 const formatContentForReading = require('./bin/lib/formatContentForReading');
 
+const authS3O = require('s3o-middleware');
 
 var requestLogger = function(req, res, next) {
     debug("RECEIVED REQUEST:", req.method, req.url);
@@ -14,33 +15,58 @@ var requestLogger = function(req, res, next) {
 }
 
 app.use(requestLogger);
-app.use('/static', express.static('static'));
 
-app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname + '/static/index.html'));
-});
+// these routes do *not* have s3o
+
+app.use('/static', express.static('static'));
 
 app.get('/__gtg', (req, res) => {
 	res.status(200).end();
 });
 
+const PODCAST_TOKEN = process.env.PODCAST_TOKEN;
+if (! PODCAST_TOKEN ) {
+  throw new Error('ERROR: PODCAST_TOKEN not specified in env');
+}
+
 app.get('/podcast', (req, res) => {
   const rssUrl = req.query.rss;
-  const voice = req.query.voice;
-  autovoice.podcast(rssUrl, voice)
-  .then(feed => {
-    res.set('Content-Type', 'application/rss+xml');
-    res.send(feed);
-  })
+  const voice  = req.query.voice;
+  const token  = req.query.token;
+
+  if (! token)                        { res.status(400).send('This call requires a token parameter.'      ).end();
+  } else if (token !== PODCAST_TOKEN) { res.status(401).send('This call requires a valid token parameter.').end();
+  } else if(! voice)                  { res.status(400).send('This call requires a voice parameter.'      ).end();
+  } else if(! rssUrl)                 { res.status(400).send('This call requires a rss parameter.'        ).end();
+  } else {
+    autovoice.podcast(rssUrl, voice)
+    .then(feed => {
+      res.set('Content-Type', 'application/rss+xml');
+      res.send(feed);
+    })
+    ;
+  }
 });
 
 app.get('/audio.mp3', (req, res) => {
   const id = req.url.split('?')[1];
-  autovoice.mp3(id)
-  .then(mp3Content => {
-    res.set('Content-Type', 'audio/mpeg');
-    res.send(mp3Content);
-  })
+  if (! id) {
+    res.status(400).send('This call requires an id parameter.').end();
+  } else {
+    autovoice.mp3(id)
+    .then(mp3Content => {
+      res.set('Content-Type', 'audio/mpeg');
+      res.send(mp3Content);
+    })
+    ;
+  }
+});
+
+// these route *do* use s3o
+app.use(authS3O);
+
+app.get('/', (req, res) => {
+	res.sendFile(path.join(__dirname + '/static/index.html'));
 });
 
 app.get('/format', (req, res) => {
