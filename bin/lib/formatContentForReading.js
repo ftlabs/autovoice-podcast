@@ -86,9 +86,9 @@ function wrap(itemData) {
 	texts.push(`This article is narrated by Experimental ${itemData.voiceId}.`);
 	texts.push( itemData.content + '.' );
 
-	texts.push(`This article was titled ${itemData.title}.`);
+	texts.push(`It is titled ${itemData.title}.`);
 	if (itemData.author) {
-		texts.push(`This article was written by ${itemData.author}.`);
+		texts.push(`It was written by ${itemData.author}.`);
 	}
   texts.push(`This article was narrated by ${itemData.voiceId}, as part of an ongoing FT Labs experiment with artificial voices.`);
 
