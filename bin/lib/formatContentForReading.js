@@ -37,6 +37,8 @@ const REPLACEMENT_PAIRS = [
 	['WaPo',     'wa po'],
 	['S&amp;P',  'S and P'],
 	['Donald Trump', 'Donald Trump,'],
+	['Ms',       'Ms.'],
+	['firstFT',       'first FT'],
 ];
 const REPLACEMENT_PATTERN_PAIRS = REPLACEMENT_PAIRS.map(
 	r => { return [new RegExp(`\\b${r[0]}\\b`, 'ig'), r[1]]; }
