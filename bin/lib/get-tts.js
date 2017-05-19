@@ -66,7 +66,7 @@ function getMp3(content, voiceId){
 		};
 		const bodyObjJson = JSON.stringify( bodyObj );
 
-		debug('getMp3: TTS_URL=' + TTS_URL + "\nbody=" + bodyObjJson);
+		// debug('getMp3: TTS_URL=' + TTS_URL + "\nbody=" + bodyObjJson);
 
 		return fetch(url, {
 			method  : 'POST',
@@ -76,7 +76,7 @@ function getMp3(content, voiceId){
 		.then( res => res.buffer() )
 		;
 	} else {
-		debug('getMp3: no content, so using file=' + defaultMp3File);
+		// debug('getMp3: no content, so using file=' + defaultMp3File);
 		return Promise.resolve( fs.readFileSync(defaultMp3File) );
 	}
 }

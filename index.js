@@ -1,12 +1,13 @@
-const dotenv = require('dotenv').config();
-const debug = require('debug')('autovoice:index');
+const  dotenv = require('dotenv').config();
+const   debug = require('debug')('autovoice:index');
 const express = require('express');
-const path = require('path');
-const app = express();
+const    path = require('path');
+const     app = express();
 
-const autovoice = require('./bin/lib/autovoice');
+const               autovoice = require('./bin/lib/autovoice');
 const formatContentForReading = require('./bin/lib/formatContentForReading');
-const individualUUIDs = require('./bin/lib/individualUUIDs');
+const         individualUUIDs = require('./bin/lib/individualUUIDs');
+const            fetchContent = require('./bin/lib/fetchContent');
 
 const authS3O = require('s3o-middleware');
 
@@ -116,6 +117,61 @@ app.get('/uuids/clear', (req, res) => {
 
 app.get('/uuids', (req, res) => {
   res.send(individualUUIDs.list());
+});
+
+//--- access points to fetch content
+
+app.get('/content/rssItems', (req, res) => {
+  const url = req.query.url;
+  if( url === undefined || url == "" ) {
+    res.status(400).send(`This call requires a rss parameter.`).end();
+  } else {
+    fetchContent.rssItems(url)
+    .then( items => {
+      res.set('Content-Type', 'application/json');
+      res.send( JSON.stringify(items) );
+    })
+    .catch( err => {
+      res.status(400).send( debug(err) ).end();
+  	})
+    ;
+  }
+});
+
+app.get('/content/article/:uuid', (req, res) => {
+  fetchContent.article(req.params.uuid)
+  .then( article => {
+    res.set('Content-Type', 'application/json');
+    res.send( JSON.stringify(article));
+  })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+app.get('/content/articleAsItem/:uuid', (req, res) => {
+  fetchContent.articleAsItem(req.params.uuid)
+  .then( item => {
+    res.set('Content-Type', 'application/json');
+    res.send( JSON.stringify(item) );
+  })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+app.get('/content/articlesAsItems', (req, res) => {
+  fetchContent.articlesAsItems()
+  .then( items => {
+    res.set('Content-Type', 'application/json');
+    res.send( JSON.stringify(items) );
+  })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
 });
 
 //---

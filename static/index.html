@@ -11,17 +11,24 @@
       <li>/mp3?id=ID_OF_MP3_CONTENT</li>
       <li>/format?text=some words to be processed</li>
       <ul>
-        <li><a href="/static/format.html"/>format</li>
+        <li><a href="/static/format.html"/>format</a></li>
       </ul>
       <li>/snippet.mp3?text=some words to be processed and spoken&voice=voiceId</li>
       <ul>
-        <li><a href="/static/snippet.html" />snippet</li>
+        <li><a href="/static/snippet.html" />snippet</a></li>
       </ul>
       <li>/uuids for specifying individual articles to be included Audio Articles</li>
       <ul>
-        <li><a href="/uuids" />list all uuids</li>
-        <li><a href="/uuids/add/UUID-GOES-HERE" />add a uuid (edit the url)</li>
-        <li><a href="/uuids/clear" />delete all uuids</li>
+        <li><a href="/uuids" />list all uuids</a></li>
+        <li><a href="/uuids/add/UUID-GOES-HERE" />add a uuid (edit the url)</a></li>
+        <li><a href="/uuids/clear" />delete all uuids</a></li>
+      </ul>
+      <li>/content for fetching content</li>
+      <ul>
+        <li><a href="/content/rssItems/RSS_URL_GOES_HERE" />fetch RSS feed, return items (edit the url)</a></li>
+        <li><a href="/content/article/UUID-GOES-HERE" />fetch an article (edit the url)</a></li>
+        <li><a href="/content/articleAsItem/UUID-GOES-HERE" />fetch an article, convert to item (edit the url)</a></li>
+        <li><a href="/content/articlesAsItems" />fetch all articles from individual uuids</a></li>
       </ul>
     </ul>
   </body>
