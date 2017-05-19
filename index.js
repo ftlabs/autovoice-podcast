@@ -6,6 +6,7 @@ const app = express();
 
 const autovoice = require('./bin/lib/autovoice');
 const formatContentForReading = require('./bin/lib/formatContentForReading');
+const individualUUIDs = require('./bin/lib/individualUUIDs');
 
 const authS3O = require('s3o-middleware');
 
@@ -102,6 +103,22 @@ app.get('/snippet.mp3', (req, res) => {
     res.send(mp3Content);
   })
 });
+
+//--- access points to add/remove/list individual uuids for inclusion in Audio Articles
+
+app.get('/uuids/add/:uuid', (req, res) => {
+  res.send(individualUUIDs.add(req.params.uuid));
+});
+
+app.get('/uuids/clear', (req, res) => {
+  res.send(individualUUIDs.clear());
+});
+
+app.get('/uuids', (req, res) => {
+  res.send(individualUUIDs.list());
+});
+
+//---
 
 app.listen(process.env.PORT, function(){
 	debug('Server is listening on port', process.env.PORT);
