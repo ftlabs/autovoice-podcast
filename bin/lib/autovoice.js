@@ -54,7 +54,7 @@ function processItemToMp3(item, voiceId){
 			.then( mp3Buffer => {
 
 				let itemDataWithMp3 = Object.assign({}, itemData, {
-					duration      : 60, // <-- NB this needs to be calculated
+					duration      : 60, // <-- NB this needs to be calculated. Will be checked/overridden by Absorber.
 					mp3Buffer     : mp3Buffer
 				});
 
@@ -82,7 +82,7 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 		fetchContent.rssItems(rssUrl),
 		fetchContent.articlesAsItems(),
 	])
-	.then( itemLists => [].concat.apply([], itemLists) )
+	.then( itemLists => [].concat.apply([], itemLists) ) // flatten the list of lists of items into a combined list of items
 	.then( items => {
 		debug(`generatePodcast: items.length=${items.length}`);
 		const promises = items.map( (item, i) => {

@@ -1,3 +1,5 @@
+// This module makes use of 'node-fetch' plus some extra data munging for a variety of content sources. 
+
 const fetch = require('node-fetch');
 const debug = require('debug')('bin:lib:fetchContent');
 

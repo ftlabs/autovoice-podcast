@@ -131,10 +131,7 @@ app.get('/content/rssItems', (req, res) => {
     res.status(400).send(`This call requires a valid rss parameter.`).end();
   } else {
     fetchContent.rssItems(url)
-    .then( items => {
-      res.set('Content-Type', 'application/json');
-      res.send( JSON.stringify(items) );
-    })
+    .then( items => { res.json( items ); })
     .catch( err => {
       res.status(400).send( debug(err) ).end();
   	})
@@ -144,10 +141,7 @@ app.get('/content/rssItems', (req, res) => {
 
 app.get('/content/article/:uuid', (req, res) => {
   fetchContent.article(req.params.uuid)
-  .then( article => {
-    res.set('Content-Type', 'application/json');
-    res.send( JSON.stringify(article));
-  })
+  .then( article => { res.json( article ); })
   .catch( err => {
     res.status(400).send( debug(err) ).end();
 	})
@@ -156,10 +150,7 @@ app.get('/content/article/:uuid', (req, res) => {
 
 app.get('/content/articleAsItem/:uuid', (req, res) => {
   fetchContent.articleAsItem(req.params.uuid)
-  .then( item => {
-    res.set('Content-Type', 'application/json');
-    res.send( JSON.stringify(item) );
-  })
+  .then( item => { res.json( item ); })
   .catch( err => {
     res.status(400).send( debug(err) ).end();
 	})
@@ -168,10 +159,7 @@ app.get('/content/articleAsItem/:uuid', (req, res) => {
 
 app.get('/content/articlesAsItems', (req, res) => {
   fetchContent.articlesAsItems()
-  .then( items => {
-    res.set('Content-Type', 'application/json');
-    res.send( JSON.stringify(items) );
-  })
+  .then( items => { res.json( items ); })
   .catch( err => {
     res.status(400).send( debug(err) ).end();
 	})
@@ -181,12 +169,11 @@ app.get('/content/articlesAsItems', (req, res) => {
 //---
 
 app.get('/validate', (req, res) => {
-  let isItValid = false;
+  let isValid = false;
   if (req.query.hasOwnProperty('url')) {
-    isItValid = validateUrl(req.query.url);
+    isValid = validateUrl(req.query.url);
   }
-  res.set('Content-Type', 'application/json');
-  res.send( JSON.stringify(isItValid) );
+  res.json( {isValid} );
 });
 
 //---
