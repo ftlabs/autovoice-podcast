@@ -1,6 +1,5 @@
-const fetch = require('node-fetch');
-const md5   = require('md5');
-const debug = require('debug')('autovoice:lib');
+const   md5 = require('md5');
+const debug = require('debug')('bin:lib:autovoice');
 
 const             extractUuid = require('./extract-uuid');
 const            parseRSSFeed = require('./parse-rss-feed');
@@ -8,138 +7,96 @@ const                     tts = require('./get-tts');
 const          dataItemsCache = require('./dataItemsCache');
 const            constructRSS = require('./constructRSS');
 const formatContentForReading = require('./formatContentForReading');
+const            fetchContent = require('./fetchContent');
 
-function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
-	debug(`generatePodcast: rssUrl=${rssUrl}, voiceId=${voiceId}`);
+function processItemToMp3(item, voiceId){
+	debug(`processItemToMp3: index=${item.processingIndex}, item.keys=${JSON.stringify(Object.keys(item))}, voiceId=${voiceId}`);
 
-	let isAlwaysNotHuman = true;
-
-	{
-		let match = /(\w+)-canBeHuman/i.exec(voiceId);
-		if (match) {
-			voiceId = match[1];
-			isAlwaysNotHuman = false;
-		}
-	}
-
-	// fetch the full rss feed
-	// loop over each item
 	// - establish if refers to an article with a valid uuid (return null if not)
 	// - invoke the TTS service on the description text
 	// - update the cache, mapping fileId to the itemData from the TTS service call
 	// - return the item data, including audio url
-	// Wait til all the processing is done
-	// construct the new rss feed
 
-	return fetch(rssUrl)
-		.then(res  => res.text())
-		.then(text => parseRSSFeed(text))
-		.then(feed => {
-			debug('generatePodcast: feed=', feed);
+	if (!item.uuid) {
+		return null;
+	} else {
+		return Promise.resolve( item.uuid )
+		.then(uuid => {
+			const itemData = Object.assign({}, item);
 
-			const promises = feed.channel[0].item.map((item, i)=> {
-				const guid = item['guid'][0];
-				debug('generatePodcast: rss item[', i, '] guid=', guid);
+			itemData.voiceId         = voiceId;
+			itemData['is-human']     = false;
+			itemData.format          = 'mp3';
 
-				const uuid = extractUuid( guid );
+			const contentForReading = formatContentForReading.wrapAndProcessItemData( itemData );
+			itemData.contentForReading         = contentForReading;
+			itemData.contentForReadingHashCode = md5(contentForReading);
 
-				if (!uuid) {
-					return null;
-				} else {
-					return Promise.resolve( uuid )
-						.then(uuid => {
-							debug('generatePodcast: promise item[', i, '] uuid=', uuid);
-							if(uuid === undefined){
-								return false;
-							}
+			const fileIdWithoutDuration = [
+					 'narrator-id=' + itemData.voiceId,
+									'uuid=' + itemData.uuid,
+							'is-human=' + itemData['is-human'],
+								'format=' + itemData.format,
+							'hashcode=' + itemData.contentForReadingHashCode,
+				].join('&');
 
-							// Set is-human to be false except when the voiceId included -canBeHuman and it is the first item.
-							// AKA, if the voiceId included -canBeHuman, set the first item to have is-human=true,
-							// otherwise always set is-human=false.
+			itemData.fileIdWithoutDuration = fileIdWithoutDuration;
 
-							let isHuman = (isAlwaysNotHuman || i>0)? false : true;
+			const cachedItemDataWithMp3 = dataItemsCache.retrieve(fileIdWithoutDuration);
+			if (cachedItemDataWithMp3) {
+				debug('processItemToMp3: retrieved from cache: title=', itemData.title, ', voiceId=', itemData.voiceId);
+				return cachedItemDataWithMp3;
+			} else {
+				debug('processItemToMp3: item not cached, so about to TTS, title=', itemData.title, ', voiceId=', itemData.voiceId);
+			}
 
-							var itemData = {
-								rssUrl  : rssUrl,
-								content : item.description[0],
-								voiceId : voiceId,
-								title   : item.title[0],
-								guid    : guid,
-								pubdate : item.pubDate[0], // <-- NB this should be the now time,
-						    author  : item.author[0],
-								processingIndex : i,
-								uuid            : uuid,
-								'is-human'      : isHuman,
-								format          : 'mp3',
-							}
+			return tts.mp3( itemData['contentForReading'], itemData.voiceId )
+			.then( mp3Buffer => {
 
-							let contentForReading = formatContentForReading.wrapAndProcessItemData( itemData );
-							// if (i > 3) {
-							// 	debug('generatePodcast: generatePodcast: setting contentForReading=""');
-							// 	contentForReading = "";
-							// }
-							itemData['contentForReading']         = contentForReading;
-							itemData['contentForReadingHashCode'] = md5(contentForReading);
+				let itemDataWithMp3 = Object.assign({}, itemData, {
+					duration      : 60, // <-- NB this needs to be calculated. Will be checked/overridden by Absorber.
+					mp3Buffer     : mp3Buffer
+				});
 
-							const fileIdWithoutDuration = [
-									 'narrator-id=' + itemData.voiceId,
-													'uuid=' + itemData.uuid,
-											'is-human=' + itemData['is-human'],
-												'format=' + itemData.format,
-											'hashcode=' + itemData.contentForReadingHashCode,
-								].join('&');
+				const fileId = [
+					itemDataWithMp3.fileIdWithoutDuration,
+					'duration=' + itemDataWithMp3.duration
+					].join('&');
 
-							itemData['fileIdWithoutDuration'] = fileIdWithoutDuration;
+				itemDataWithMp3['fileId'] = fileId;
 
-							const cachedItemDataWithMp3 = dataItemsCache.retrieve(fileIdWithoutDuration);
-							if (cachedItemDataWithMp3) {
-								debug('generatePodcast: retrieved from cache: title=', item.title[0], ', voiceId=', itemData.voiceId);
-								return cachedItemDataWithMp3;
-							} else {
-								debug('generatePodcast: item not cached, so about to TTS, title=', item.title[0], ', voiceId=', itemData.voiceId);
-							}
+				debug(`processItemToMp3: post tts.mp3 item[${itemDataWithMp3.processingIndex}] mp3Buffer.length=${mp3Buffer.length}` );
 
-							return tts.mp3( itemData['contentForReading'], itemData.voiceId )
-							.then( mp3Buffer => {
+				dataItemsCache.store(itemDataWithMp3);
 
-								let itemDataWithMp3 = Object.assign({}, itemData, {
-									duration      : 60, // <-- NB this needs to be calculated
-									mp3Buffer     : mp3Buffer
-								});
-
-								const fileId = [
-									itemDataWithMp3.fileIdWithoutDuration,
-									'duration=' + itemDataWithMp3.duration
-									].join('&');
-
-								itemDataWithMp3['fileId'] = fileId;
-
-								debug('generatePodcast: post tts.mp3 item [ ' + itemDataWithMp3.processingIndex + ' ] mp3Buffer.length=' + mp3Buffer.length );
-
-								dataItemsCache.store(itemDataWithMp3);
-
-								return itemDataWithMp3;
-							});
-						});
-					}
-				})
-
-			debug('num promises=', promises.length);
-
-			return Promise.all(promises).then(items => {
-				debug('in Promise.all');
-				const feed = constructRSS(rssUrl, items);
-				return feed;
-			}, reason => {
-				debug('in Promise.all rejecting:', reason)
+				return itemDataWithMp3;
 			});
-
-		})
-		.catch(err => {
-			debug(err);
-		})
-		;
+		});
 	}
+}
+
+function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
+	debug(`generatePodcast: rssUrl=${rssUrl}, voiceId=${voiceId}`);
+
+	return Promise.all([
+		fetchContent.rssItems(rssUrl),
+		fetchContent.articlesAsItems(),
+	])
+	.then( itemLists => [].concat.apply([], itemLists) ) // flatten the list of lists of items into a combined list of items
+	.then( items => {
+		debug(`generatePodcast: items.length=${items.length}`);
+		const promises = items.map( (item, i) => {
+			item.processingIndex = i;
+			return processItemToMp3(item, voiceId);
+		} );
+		return Promise.all(promises);
+	})
+	.then( items => {
+		const feed = constructRSS(rssUrl, items);
+		return feed;
+	})
+	;
+}
 
 function getMp3(fileId){
 	const itemData = dataItemsCache.retrieve(fileId);

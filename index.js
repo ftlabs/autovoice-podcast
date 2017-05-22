@@ -1,11 +1,14 @@
-const dotenv = require('dotenv').config();
-const debug = require('debug')('autovoice:index');
+const  dotenv = require('dotenv').config();
+const   debug = require('debug')('autovoice:index');
 const express = require('express');
-const path = require('path');
-const app = express();
+const    path = require('path');
+const     app = express();
 
-const autovoice = require('./bin/lib/autovoice');
+const               autovoice = require('./bin/lib/autovoice');
 const formatContentForReading = require('./bin/lib/formatContentForReading');
+const         individualUUIDs = require('./bin/lib/individualUUIDs');
+const            fetchContent = require('./bin/lib/fetchContent');
+const             validateUrl = require('./bin/lib/validate-url');
 
 const authS3O = require('s3o-middleware');
 
@@ -34,10 +37,11 @@ app.get('/podcast', (req, res) => {
   const voice  = req.query.voice;
   const token  = req.query.token;
 
-  if (! token)                        { res.status(400).send('This call requires a token parameter.'      ).end();
-  } else if (token !== PODCAST_TOKEN) { res.status(401).send('This call requires a valid token parameter.').end();
-  } else if(! voice)                  { res.status(400).send('This call requires a voice parameter.'      ).end();
-  } else if(! rssUrl)                 { res.status(400).send('This call requires a rss parameter.'        ).end();
+  if       ( ! token                 ) { res.status(400).send('This call requires a token parameter.'      ).end();
+  } else if( token !== PODCAST_TOKEN ) { res.status(401).send('This call requires a valid token parameter.').end();
+  } else if( ! voice                 ) { res.status(400).send('This call requires a voice parameter.'      ).end();
+  } else if( ! rssUrl                ) { res.status(400).send('This call requires a rss parameter.'        ).end();
+  } else if( ! validateUrl(rssUrl)   ) { res.status(400).send('This call requires a valid rss parameter.'  ).end();
   } else {
     autovoice.podcast(rssUrl, voice)
     .then(feed => {
@@ -102,6 +106,77 @@ app.get('/snippet.mp3', (req, res) => {
     res.send(mp3Content);
   })
 });
+
+//--- access points to add/remove/list individual uuids for inclusion in Audio Articles
+
+app.get('/uuids/add/:uuid', (req, res) => {
+  res.send(individualUUIDs.add(req.params.uuid));
+});
+
+app.get('/uuids/clear', (req, res) => {
+  res.send(individualUUIDs.clear());
+});
+
+app.get('/uuids', (req, res) => {
+  res.send(individualUUIDs.list());
+});
+
+//--- access points to fetch content
+
+app.get('/content/rssItems', (req, res) => {
+  const url = req.query.url;
+  if( url === undefined || url == "" ) {
+    res.status(400).send(`This call requires a rss parameter.`).end();
+  } else if( ! validateUrl(url) ) {
+    res.status(400).send(`This call requires a valid rss parameter.`).end();
+  } else {
+    fetchContent.rssItems(url)
+    .then( items => { res.json( items ); })
+    .catch( err => {
+      res.status(400).send( debug(err) ).end();
+  	})
+    ;
+  }
+});
+
+app.get('/content/article/:uuid', (req, res) => {
+  fetchContent.article(req.params.uuid)
+  .then( article => { res.json( article ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+app.get('/content/articleAsItem/:uuid', (req, res) => {
+  fetchContent.articleAsItem(req.params.uuid)
+  .then( item => { res.json( item ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+app.get('/content/articlesAsItems', (req, res) => {
+  fetchContent.articlesAsItems()
+  .then( items => { res.json( items ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+//---
+
+app.get('/validate', (req, res) => {
+  let isValid = false;
+  if (req.query.hasOwnProperty('url')) {
+    isValid = validateUrl(req.query.url);
+  }
+  res.json( {isValid} );
+});
+
+//---
 
 app.listen(process.env.PORT, function(){
 	debug('Server is listening on port', process.env.PORT);

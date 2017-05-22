@@ -7,7 +7,7 @@ const cache = {}; // mapping fileIdWithoutDuration to itemData
 
 function store( itemData ) {
 	if( itemData && itemData.fileIdWithoutDuration ) {
-		debug('dataItemsCache.store: adding fileIdWithoutDuration=', itemData.fileIdWithoutDuration);
+		debug(`dataItemsCache.store: adding fileIdWithoutDuration=${itemData.fileIdWithoutDuration}`);
 		cache[ itemData.fileIdWithoutDuration ] = itemData;
 		return itemData.fileIdWithoutDuration;
 	} else {

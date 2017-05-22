@@ -37,11 +37,12 @@ More details
 
 When building locally, specify them in a local file, .env (and NB, this must not be included in the git repo, hence has a specific line in .gitignore). When deploying to Heroku, they need to be specified in the app's settings, Config Variables.
 
-The following are mandatory params:
+The following are mandatory params, the absence of which will kill the app on startup:
 
 * TTS_URL=URL_OF_THE_TEXT_TO_SPEECH_SERVICE
 * TTS_TOKEN=...
-* PODCAST_TOKEN=... (the absence of this will kill the app on startup)
+* PODCAST_TOKEN=...
+* CAPI_KEY=...
 
 These are for local builds:
 

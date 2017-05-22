@@ -2,9 +2,13 @@ const fetch = require('node-fetch');
 const debug = require('debug')('autovoice:get-tts');
 const    fs = require('fs');
 
+const validateUrl = require('./validate-url');
+
 const TTS_URL   = process.env.TTS_URL;
 if (! TTS_URL ) {
 	throw new Error('ERROR: TTS_URL not specified in env');
+} else if(! validateUrl(TTS_URL) ) {
+	throw new Error('ERROR: TTS_URL is not a valid url');
 }
 
 const TTS_TOKEN = process.env.TTS_TOKEN;
@@ -66,7 +70,7 @@ function getMp3(content, voiceId){
 		};
 		const bodyObjJson = JSON.stringify( bodyObj );
 
-		debug('getMp3: TTS_URL=' + TTS_URL + "\nbody=" + bodyObjJson);
+		// debug('getMp3: TTS_URL=' + TTS_URL + "\nbody=" + bodyObjJson);
 
 		return fetch(url, {
 			method  : 'POST',
@@ -76,7 +80,7 @@ function getMp3(content, voiceId){
 		.then( res => res.buffer() )
 		;
 	} else {
-		debug('getMp3: no content, so using file=' + defaultMp3File);
+		// debug('getMp3: no content, so using file=' + defaultMp3File);
 		return Promise.resolve( fs.readFileSync(defaultMp3File) );
 	}
 }
