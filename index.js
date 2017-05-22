@@ -8,6 +8,7 @@ const               autovoice = require('./bin/lib/autovoice');
 const formatContentForReading = require('./bin/lib/formatContentForReading');
 const         individualUUIDs = require('./bin/lib/individualUUIDs');
 const            fetchContent = require('./bin/lib/fetchContent');
+const             validateUrl = require('./bin/lib/validate-url');
 
 const authS3O = require('s3o-middleware');
 
@@ -172,6 +173,17 @@ app.get('/content/articlesAsItems', (req, res) => {
     res.status(400).send( debug(err) ).end();
 	})
   ;
+});
+
+//---
+
+app.get('/validate', (req, res) => {
+  let isItValid = false;
+  if (req.query.hasOwnProperty('url')) {
+    isItValid = validateUrl(req.query.url);
+  }
+  res.set('Content-Type', 'application/json');
+  res.send( JSON.stringify(isItValid) );
 });
 
 //---
