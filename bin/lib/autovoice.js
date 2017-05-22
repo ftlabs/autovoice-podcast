@@ -141,5 +141,6 @@ function getSnippetMp3(snippet, voiceId){
 module.exports = {
 	podcast : generatePodcast,
 	mp3     : getMp3,
-	snippetMp3 : getSnippetMp3
+	snippetMp3 : getSnippetMp3,
+	generateItemMp3 : processItemToMp3,
 };

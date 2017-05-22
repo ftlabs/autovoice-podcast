@@ -12,6 +12,13 @@ const             validateUrl = require('./bin/lib/validate-url');
 
 const authS3O = require('s3o-middleware');
 
+const SERVER_ROOT = process.env.SERVER_ROOT;
+if (! SERVER_ROOT ) {
+	throw new Error('ERROR: SERVER_ROOT not specified in env');
+} else if( ! validateUrl(SERVER_ROOT)){
+	throw new Error('ERROR: SERVER_ROOT is not a valid url');
+}
+
 var requestLogger = function(req, res, next) {
     debug("RECEIVED REQUEST:", req.method, req.url);
     next(); // Passing the request to the next handler in the stack.
@@ -67,6 +74,8 @@ app.get('/audio.mp3', (req, res) => {
 });
 
 // these route *do* use s3o
+app.set('json spaces', 2);
+
 app.use(authS3O);
 
 app.get('/', (req, res) => {
@@ -174,6 +183,23 @@ app.get('/validate', (req, res) => {
     isValid = validateUrl(req.query.url);
   }
   res.json( {isValid} );
+});
+
+//---
+
+app.get('/content/articleAsItem/:uuid/voice/:voiceId', (req, res) => {
+
+  fetchContent.articleAsItem(req.params.uuid)
+  .then( item => { return autovoice.generateItemMp3( item, req.params.voiceId ); })
+  .then( item => { return Object.assign({}, item); })
+  .then( item => {
+    item.mp3Buffer = '...stripped out';
+    item.mp3Url    = `${SERVER_ROOT}/audio.mp3?${item.fileId}`;
+    return item;
+  })
+  .then( item => { res.json( item ); })
+  .catch( err => { res.status(400).send( debug(err) ).end(); })
+  ;
 });
 
 //---
