@@ -1,9 +1,13 @@
 const debug = require('debug')('bin:lib:constructRSS');
 const   RSS = require('rss');
 
+const validateUrl = require('./validate-url');
+
 const SERVER_ROOT = process.env.SERVER_ROOT;
 if (! SERVER_ROOT ) {
 	throw new Error('ERROR: SERVER_ROOT not specified in env');
+} else if( ! validateUrl(SERVER_ROOT)){
+	throw new Error('ERROR: SERVER_ROOT is not a valid url');
 }
 
 const MP3_PATH = '/audio.mp3';

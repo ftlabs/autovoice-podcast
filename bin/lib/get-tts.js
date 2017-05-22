@@ -2,9 +2,13 @@ const fetch = require('node-fetch');
 const debug = require('debug')('autovoice:get-tts');
 const    fs = require('fs');
 
+const validateUrl = require('./validate-url');
+
 const TTS_URL   = process.env.TTS_URL;
 if (! TTS_URL ) {
 	throw new Error('ERROR: TTS_URL not specified in env');
+} else if(! validateUrl(TTS_URL) ) {
+	throw new Error('ERROR: TTS_URL is not a valid url');
 }
 
 const TTS_TOKEN = process.env.TTS_TOKEN;
