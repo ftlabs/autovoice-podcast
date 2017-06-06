@@ -99,10 +99,10 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 	;
 }
 
-function generateFirstFtBasedPodcast(maxResults, requestedUrl, voiceId=tts.defaultVoiceId){
+function generateFirstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUuids, voiceId=tts.defaultVoiceId){
 	debug(`generateFirstFtBasedPodcast: maxResults=${maxResults}, voiceId=${voiceId}`);
 
-	return fetchContent.getLastFewFirstFtMentionedUuids(maxResults)
+	return fetchContent.getLastFewFirstFtMentionedUuids(maxResults, includeFirstFtUuids)
 	.then( firstFtBasedUuids => firstFtBasedUuids.concat(individualUUIDs.list()) )
 	.then( uuids => fetchContent.articlesAsItems( uuids ) )
 	.then( items => {

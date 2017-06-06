@@ -9,6 +9,7 @@
     <ul>
       <li>/podcast?voice=VOICE&token=TOKEN&rss=URL_OF_ARTICLE_RSS_FEED</li>
       <li>/podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN</li>
+      <li>/podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN&skipFirstFtUuids=true</li>
       <li>/mp3?id=ID_OF_MP3_CONTENT</li>
       <li>/format?text=some words to be processed</li>
       <ul>
@@ -40,6 +41,7 @@
       <li>/podcast</li>
       <ul>
         <li><a href="/podcast/basedOnFirstFt/1/Amy" />/podcast/basedOnFirstFt/1/Amy</a> and any named UUIDs (edit the url)</li>
+        <li><a href="/podcast/basedOnFirstFt/1/Amy?skipFirstFtUuids=true" />/podcast/basedOnFirstFt/1/Amy</a> and any named UUIDs, with skipFirstFtUuids=true (edit the url)</li>
       </ul>
       <li>/validate for validating stuff</li>
       <ul>

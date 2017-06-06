@@ -57,11 +57,13 @@ app.get('/podcastBasedOnFirstFt/:maxResults/:voice', (req, res) => {
   const       voice  = req.params.voice;
   const requestedUrl = process.env.SERVER_ROOT + '/' + req.originalUrl;
   const       token  = req.query.token;
+  const skipFirstFtUuids = req.query.skipFirstFtUuids;
+  const includeFirstFtUuids = !(skipFirstFtUuids == 'true');
 
   if       ( ! token                 ) { res.status(400).send('This call requires a token parameter.'      ).end();
   } else if( token !== PODCAST_TOKEN ) { res.status(401).send('This call requires a valid token parameter.').end();
   } else {
-    autovoice.firstFtBasedPodcast(maxResults, requestedUrl, voice)
+    autovoice.firstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUuids, voice)
     .then(feed => {
       res.set('Content-Type', 'application/rss+xml');
       res.send(feed);
@@ -224,16 +226,18 @@ app.get('/content/getLastFewFirstFtMentionedUuids/:maxResults', (req, res) => {
 });
 
 app.get('/podcast/basedOnFirstFt/:maxResults/:voice', (req, res) => {
-    const maxResults = req.params.maxResults;
-    const     voice  = req.params.voice;
-  const requestedUrl = process.env.SERVER_ROOT + '/' + req.originalUrl;
+  const       maxResults = req.params.maxResults;
+  const           voice  = req.params.voice;
+  const     requestedUrl = process.env.SERVER_ROOT + '/' + req.originalUrl;
+  const skipFirstFtUuids = req.query.skipFirstFtUuids;
+  const includeFirstFtUuids = !(skipFirstFtUuids == 'true');
 
-    autovoice.firstFtBasedPodcast(maxResults, requestedUrl, voice)
-    .then(feed => {
-      res.set('Content-Type', 'application/rss+xml');
-      res.send(feed);
-    })
-    ;
+  autovoice.firstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUuids, voice)
+  .then(feed => {
+    res.set('Content-Type', 'application/rss+xml');
+    res.send(feed);
+  })
+  ;
 });
 
 //---
