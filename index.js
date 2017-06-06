@@ -187,8 +187,8 @@ app.get('/content/search/:uuid', (req, res) => {
   ;
 });
 
-app.get('/content/searchLastFewFirstFT/:maxResults', (req, res) => {
-  fetchContent.searchLastFewFirstFT(req.params.maxResults)
+app.get('/content/searchLastFewFirstFt/:maxResults', (req, res) => {
+  fetchContent.searchLastFewFirstFt(req.params.maxResults)
   .then( item => { res.json( item ); })
   .catch( err => {
     res.status(400).send( debug(err) ).end();

@@ -80,8 +80,11 @@ function searchByUUID(uuid) {
 	return search({queryString: uuid});
 }
 
-function searchLastFewFirstFT(maxResults) {
+function searchLastFewFirstFt(maxResults) {
 	return search({queryString: `brand:FirstFT`, maxResults: maxResults});
+}
+
+function getLastFewFirstFtMentions(maxResults) {
 }
 
 function parseRssItemToItem( rssItem ){
@@ -161,5 +164,5 @@ module.exports = {
 	articleAsItem,
 	articlesAsItems,
 	searchByUUID,
-	searchLastFewFirstFT,
+	searchLastFewFirstFt,
 };
