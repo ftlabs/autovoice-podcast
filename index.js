@@ -196,6 +196,15 @@ app.get('/content/searchLastFewFirstFt/:maxResults', (req, res) => {
   ;
 });
 
+app.get('/content/getLastFewFirstFtMentions/:maxResults', (req, res) => {
+  fetchContent.getLastFewFirstFtMentions(req.params.maxResults)
+  .then( item => { res.json( item ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
 //---
 
 app.listen(process.env.PORT, function(){
