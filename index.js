@@ -158,7 +158,7 @@ app.get('/content/articleAsItem/:uuid', (req, res) => {
 });
 
 app.get('/content/articlesAsItems', (req, res) => {
-  fetchContent.articlesAsItems()
+  fetchContent.articlesAsItems( individualUUIDs.list() )
   .then( items => { res.json( items ); })
   .catch( err => {
     res.status(400).send( debug(err) ).end();

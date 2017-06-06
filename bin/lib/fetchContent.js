@@ -5,7 +5,6 @@ const debug = require('debug')('bin:lib:fetchContent');
 
 const     extractUuid = require('./extract-uuid');
 const    parseRSSFeed = require('./parse-rss-feed');
-const individualUUIDs = require('./individualUUIDs');
 
 const CAPI_KEY = process.env.CAPI_KEY;
 if (! CAPI_KEY ) {
@@ -190,8 +189,7 @@ function articleAsItem(uuid) {
 	;
 }
 
-function articlesAsItems() {
-	const uuids = individualUUIDs.list();
+function articlesAsItems(uuids) {
 	const promises = uuids.map(articleAsItem);
 	return Promise.all( promises );
 }

@@ -8,6 +8,7 @@ const          dataItemsCache = require('./dataItemsCache');
 const            constructRSS = require('./constructRSS');
 const formatContentForReading = require('./formatContentForReading');
 const            fetchContent = require('./fetchContent');
+const         individualUUIDs = require('./individualUUIDs');
 
 function processItemToMp3(item, voiceId){
 	debug(`processItemToMp3: index=${item.processingIndex}, item.keys=${JSON.stringify(Object.keys(item))}, voiceId=${voiceId}`);
@@ -80,7 +81,7 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 
 	return Promise.all([
 		fetchContent.rssItems(rssUrl),
-		fetchContent.articlesAsItems(),
+		fetchContent.articlesAsItems( individualUUIDs.list() ),
 	])
 	.then( itemLists => [].concat.apply([], itemLists) ) // flatten the list of lists of items into a combined list of items
 	.then( items => {
