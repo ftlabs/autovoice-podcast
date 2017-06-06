@@ -84,24 +84,25 @@ function searchLastFewFirstFt(maxResults) {
 	return search({queryString: `brand:FirstFT`, maxResults: maxResults});
 }
 
+function extractFirstFtIds( sapiObj ){
+	let uuids = [];
+	if (! sapiObj.results ) {
+		debug(`getLastFewFirstFtMentions: no sapiObj.results`);
+	} else if (! sapiObj.results[0]) {
+		debug(`getLastFewFirstFtMentions: no sapiObj.results[0]`);
+	} else if (! sapiObj.results[0].results) {
+		debug(`getLastFewFirstFtMentions: no sapiObj.results[0].results`);
+	} else if (sapiObj.results[0].results.length == 0) {
+		debug(`getLastFewFirstFtMentions: sapiObj.results[0].results.length == 0`);
+	} else {
+		uuids = sapiObj.results[0].results.map( r => { return r.id; } );
+	}
+	return uuids
+}
+
 function getLastFewFirstFtMentions(maxResults) {
 	return searchLastFewFirstFt(maxResults)
-	.then( searchObj => searchObj.sapiObj )
-	.then(   sapiObj => {
-		let uuids = [];
-		if (! sapiObj.results ) {
-			debug(`getLastFewFirstFtMentions: no sapiObj.results`);
-		} else if (! sapiObj.results[0]) {
-			debug(`getLastFewFirstFtMentions: no sapiObj.results[0]`);
-		} else if (! sapiObj.results[0].results) {
-			debug(`getLastFewFirstFtMentions: no sapiObj.results[0].results`);
-		} else if (sapiObj.results[0].results.length == 0) {
-			debug(`getLastFewFirstFtMentions: sapiObj.results[0].results.length == 0`);
-		} else {
-			uuids = sapiObj.results[0].results.map( r => { return r.id; } );
-		}
-		return uuids
-	})
+	.then( searchObj => extractFirstFtIds(searchObj.sapiObj) )
 	;
 }
 
