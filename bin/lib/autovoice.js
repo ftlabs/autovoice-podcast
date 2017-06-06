@@ -99,6 +99,27 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 	;
 }
 
+function generateFirstFtBasedPodcast(maxResults, requestedUrl, voiceId=tts.defaultVoiceId){
+	debug(`generateFirstFtBasedPodcast: maxResults=${maxResults}, voiceId=${voiceId}`);
+
+	return fetchContent.getLastFewFirstFtMentionedUuids(maxResults)
+	.then( firstFtBasedUuids => firstFtBasedUuids.concat(individualUUIDs.list()) )
+	.then( uuids => fetchContent.articlesAsItems( uuids ) )
+	.then( items => {
+		debug(`generateFirstFtBasedPodcast: items.length=${items.length}`);
+		const promises = items.map( (item, i) => {
+			item.processingIndex = i;
+			return processItemToMp3(item, voiceId);
+		} );
+		return Promise.all(promises);
+	})
+	.then( items => {
+		const feed = constructRSS(requestedUrl, items);
+		return feed;
+	})
+	;
+}
+
 function getMp3(fileId){
 	const itemData = dataItemsCache.retrieve(fileId);
 	if ( itemData ) {
@@ -142,5 +163,6 @@ function getSnippetMp3(snippet, voiceId){
 module.exports = {
 	podcast : generatePodcast,
 	mp3     : getMp3,
-	snippetMp3 : getSnippetMp3
+	snippetMp3 : getSnippetMp3,
+	firstFtBasedPodcast: generateFirstFtBasedPodcast,
 };
