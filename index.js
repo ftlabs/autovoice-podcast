@@ -196,8 +196,8 @@ app.get('/content/searchLastFewFirstFt/:maxResults', (req, res) => {
   ;
 });
 
-app.get('/content/getLastFewFirstFtMentions/:maxResults', (req, res) => {
-  fetchContent.getLastFewFirstFtMentions(req.params.maxResults)
+app.get('/content/getLastFewFirstFtMentionedUuids/:maxResults', (req, res) => {
+  fetchContent.getLastFewFirstFtMentionedUuids(req.params.maxResults)
   .then( item => { res.json( item ); })
   .catch( err => {
     res.status(400).send( debug(err) ).end();

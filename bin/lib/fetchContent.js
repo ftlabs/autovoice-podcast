@@ -87,22 +87,41 @@ function searchLastFewFirstFt(maxResults) {
 function extractFirstFtIds( sapiObj ){
 	let uuids = [];
 	if (! sapiObj.results ) {
-		debug(`getLastFewFirstFtMentions: no sapiObj.results`);
+		debug(`extractFirstFtIds: no sapiObj.results`);
 	} else if (! sapiObj.results[0]) {
-		debug(`getLastFewFirstFtMentions: no sapiObj.results[0]`);
+		debug(`extractFirstFtIds: no sapiObj.results[0]`);
 	} else if (! sapiObj.results[0].results) {
-		debug(`getLastFewFirstFtMentions: no sapiObj.results[0].results`);
+		debug(`extractFirstFtIds: no sapiObj.results[0].results`);
 	} else if (sapiObj.results[0].results.length == 0) {
-		debug(`getLastFewFirstFtMentions: sapiObj.results[0].results.length == 0`);
+		debug(`extractFirstFtIds: sapiObj.results[0].results.length == 0`);
 	} else {
 		uuids = sapiObj.results[0].results.map( r => { return r.id; } );
 	}
 	return uuids
 }
 
-function getLastFewFirstFtMentions(maxResults) {
+// <ft-content type=\"http://www.ft.com/ontology/content/Article\" url=\"http://api.ft.com/content/dd033082-49e9-11e7-a3f4-c742b9791d43\" title=\"www.ft.com\">paid up to $1bn</ft-content>
+const reFtContent = new RegExp(/<ft-content\s+type=\"http:\/\/www.ft.com\/ontology\/content\/Article\"\s+url=\"http:\/\/api.ft.com\/content\/([a-f0-9-]+)\"/, 'g');
+
+function getLastFewFirstFtMentionedUuids(maxResults, includeFirstFtUuids=false) {
 	return searchLastFewFirstFt(maxResults)
 	.then( searchObj => extractFirstFtIds(searchObj.sapiObj) )
+	.then( firstFtUuids => {
+		const promises = firstFtUuids.map(uuid => {return article(uuid);});
+		const uuids = (includeFirstFtUuids)? firstFtUuids : [];
+
+		return Promise.all(promises)
+		.then(articles => articles.map(article => {return article.bodyXML;} ) )
+		.then(bodyXMLs => bodyXMLs.join('') )
+		.then(bodyXML => {
+			let match;
+			while ((match = reFtContent.exec(bodyXML)) !== null) {
+				uuids.push(match[1])
+			}
+			return uuids;
+		})
+		;
+	})
 	;
 }
 
@@ -184,5 +203,5 @@ module.exports = {
 	articlesAsItems,
 	searchByUUID,
 	searchLastFewFirstFt,
-	getLastFewFirstFtMentions,
+	getLastFewFirstFtMentionedUuids,
 };
