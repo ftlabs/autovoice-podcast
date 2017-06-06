@@ -178,6 +178,26 @@ app.get('/validate', (req, res) => {
 
 //---
 
+app.get('/content/search/:uuid', (req, res) => {
+  fetchContent.searchByUUID(req.params.uuid)
+  .then( item => { res.json( item ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+app.get('/content/searchLastFewFirstFT/:maxResults', (req, res) => {
+  fetchContent.searchLastFewFirstFT(req.params.maxResults)
+  .then( item => { res.json( item ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+//---
+
 app.listen(process.env.PORT, function(){
 	debug('Server is listening on port', process.env.PORT);
 });

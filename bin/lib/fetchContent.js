@@ -1,4 +1,4 @@
-// This module makes use of 'node-fetch' plus some extra data munging for a variety of content sources. 
+// This module makes use of 'node-fetch' plus some extra data munging for a variety of content sources.
 
 const fetch = require('node-fetch');
 const debug = require('debug')('bin:lib:fetchContent');
@@ -13,6 +13,76 @@ if (! CAPI_KEY ) {
 }
 
 const CAPI_PATH = 'http://api.ft.com/enrichedcontent/';
+const SAPI_PATH = 'http://api.ft.com/content/search/v1';
+
+function constructSAPIQuery( params ) {
+
+	const defaults = {
+		queryString : "",
+	   maxResults : 1,
+		     offset : 0,
+		    aspects : [ "title"], // [ "title", "location", "summary", "lifecycle", "metadata"],
+		constraints : []
+	};
+
+	const combined = Object.assign({}, defaults, params);
+
+	let queryString = combined.queryString;
+	if (queryString == '' && combined.constraints.length > 0 ) {
+		queryString = combined.constraints.join(' and ');
+	}
+
+	const full = {
+  	"queryString": queryString,
+  	"queryContext" : {
+         "curations" : [ "ARTICLES", "BLOGS" ]
+		},
+  	"resultContext" : {
+			"maxResults" : `${combined.maxResults}`,
+		 	    "offset" : `${combined.offset}`,
+			   "aspects" : combined.aspects,
+			 "sortOrder" : "DESC",
+			 "sortField" : "lastPublishDateTime",
+			    // "facets" : {"names":["people"], "maxElements":-1}
+  	}
+	}
+
+	return full;
+}
+
+function search(params) {
+	const sapiUrl = `${SAPI_PATH}?apiKey=${CAPI_KEY}`;
+	const sapiQuery = constructSAPIQuery( params );
+	debug(`search: sapiQuery=${JSON.stringify(sapiQuery)}`);
+
+	return fetch(sapiUrl, {
+		 method: 'POST',
+       body: JSON.stringify(sapiQuery),
+		headers: {
+			'Content-Type' : 'application/json',
+		},
+	})
+	.then( res  => res.text() )
+	.then( text => {
+		debug(`search: res.text=${text}`);
+		return text;
+	})
+	.then( text => {
+		return {
+			params : params,
+			sapiObj : JSON.parse(text)
+		};
+	} )
+	;
+}
+
+function searchByUUID(uuid) {
+	return search({queryString: uuid});
+}
+
+function searchLastFewFirstFT(maxResults) {
+	return search({queryString: `brand:FirstFT`, maxResults: maxResults});
+}
 
 function parseRssItemToItem( rssItem ){
 	const itemData = {
@@ -90,4 +160,6 @@ module.exports = {
 	article,
 	articleAsItem,
 	articlesAsItems,
+	searchByUUID,
+	searchLastFewFirstFT,
 };
