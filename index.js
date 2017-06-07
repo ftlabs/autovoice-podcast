@@ -37,11 +37,11 @@ app.get('/podcast', (req, res) => {
   const voice  = req.query.voice;
   const token  = req.query.token;
 
-  if       ( ! token                 ) { res.status(400).send('This call requires a token parameter.'      ).end();
-  } else if( token !== PODCAST_TOKEN ) { res.status(401).send('This call requires a valid token parameter.').end();
-  } else if( ! voice                 ) { res.status(400).send('This call requires a voice parameter.'      ).end();
-  } else if( ! rssUrl                ) { res.status(400).send('This call requires a rss parameter.'        ).end();
-  } else if( ! validateUrl(rssUrl)   ) { res.status(400).send('This call requires a valid rss parameter.'  ).end();
+  if       ( ! token                 ) { res.status(400).send('This call requires a token parameter.'      );
+  } else if( token !== PODCAST_TOKEN ) { res.status(401).send('This call requires a valid token parameter.');
+  } else if( ! voice                 ) { res.status(400).send('This call requires a voice parameter.'      );
+  } else if( ! rssUrl                ) { res.status(400).send('This call requires a rss parameter.'        );
+  } else if( ! validateUrl(rssUrl)   ) { res.status(400).send('This call requires a valid rss parameter.'  );
   } else {
     autovoice.podcast(rssUrl, voice)
     .then(feed => {

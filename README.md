@@ -14,7 +14,9 @@ More details
 # new end points
 
 * /podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN
+   * returns an RSS feed with MP3 of each item (aka a podcast), for the most recent few firstFT articles and all the FT articles they in turn refer to
 * /podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN&skipFirstFtUuids=true
+   * as above, but without the firstFT articles
 * /podcast?token=TOKEN&voice=VOICE_ID&rss=URL_OF_ARTICLE_RSS_FEED
    * return full podcast feed, including refs to mp3 files
    * VOICE_ID needs to match one of the known voices

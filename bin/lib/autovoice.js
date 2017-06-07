@@ -113,10 +113,7 @@ function generateFirstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUui
 		} );
 		return Promise.all(promises);
 	})
-	.then( items => {
-		const feed = constructRSS(requestedUrl, items);
-		return feed;
-	})
+	.then( items => constructRSS(requestedUrl, items) )
 	;
 }
 
