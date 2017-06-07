@@ -13,6 +13,8 @@ More details
 
 # new end points
 
+* /podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN
+* /podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN&skipFirstFtUuids=true
 * /podcast?token=TOKEN&voice=VOICE_ID&rss=URL_OF_ARTICLE_RSS_FEED
    * return full podcast feed, including refs to mp3 files
    * VOICE_ID needs to match one of the known voices
