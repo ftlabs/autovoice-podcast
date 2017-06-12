@@ -14,6 +14,8 @@ if (! CAPI_KEY ) {
 const CAPI_PATH = 'http://api.ft.com/enrichedcontent/';
 const SAPI_PATH = 'http://api.ft.com/content/search/v1';
 
+const UUID_WEB_URL_PREFIX = 'http://www.ft.com/content/';
+
 function constructSAPIQuery( params ) {
 
 	const defaults = {
@@ -167,14 +169,15 @@ function article(uuid) {
 }
 
 function parseArticleJsonToItem( json ){
+	const uuid = extractUuid(json.id);
 
 	const itemData = {
 		content : json.bodyXML,
 		title   : json.title,
-		guid    : json.webUrl,
+		guid    : UUID_WEB_URL_PREFIX + uuid,
 		pubdate : json.publishedDate, // <-- NB this should be the now time,
 		author  : json.byline,
-		uuid    : extractUuid(json.id),
+		uuid    : uuid,
 	}
 
 	return itemData;
