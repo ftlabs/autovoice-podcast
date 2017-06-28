@@ -109,6 +109,16 @@ app.get('/format', (req, res) => {
   res.send(body);
 });
 
+app.get('/formatArticleForReading/:uuid', (req, res) => {
+  fetchContent.articleAsItem(req.params.uuid)
+  .then( item => { return formatContentForReading.processText(item.content) } )
+  .then( text => { res.send( text ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
 app.get('/snippet.mp3', (req, res) => {
   let   text  = req.query.text;
   const voice = req.query.voice;
