@@ -54,3 +54,4 @@ These are for local builds:
    * to use when constructing the podcast feed
    * e.g. when developing locally, http://localhost:8060
 * DEBUG=autovoice:\*,bin:lib:\*
+* NO_S3O=true # if you want to skip the s3o step when building locally

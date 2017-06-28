@@ -86,8 +86,12 @@ app.get('/audio.mp3', (req, res) => {
   }
 });
 
-// these route *do* use s3o
-app.use(authS3O);
+if (process.env.NO_S3O === "true") {
+  // skip s3o
+} else {
+  // these route *do* use s3o
+  app.use(authS3O);
+}
 
 app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname + '/static/index.html'));
