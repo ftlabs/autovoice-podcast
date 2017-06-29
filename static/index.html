@@ -7,28 +7,42 @@
   <body>
     <h1>Assorted endpoints for autovoice</h1>
     <ul>
-      <li>/podcast?rss=URL_OF_ARTICLE_RSS_FEED</li>
+      <li>/podcast?voice=VOICE&amp;token=TOKEN&amp;rss=URL_OF_ARTICLE_RSS_FEED</li>
+      <li>/podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN</li>
+      <li>/podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN&amp;skipFirstFtUuids=true</li>
       <li>/mp3?id=ID_OF_MP3_CONTENT</li>
       <li>/format?text=some words to be processed</li>
       <ul>
         <li><a href="/static/format.html"/>format</a></li>
+        <li><a href="/formatArticleForReading/5b48de66-4ad4-11e7-a3f4-c742b9791d43"/>/formatArticleForReading/:uuid</a> (edit the url)</li>
       </ul>
-      <li>/snippet.mp3?text=some words to be processed and spoken&voice=voiceId</li>
+      <li>/snippet.mp3?text=some words to be processed and spoken&amp;voice=voiceId</li>
       <ul>
         <li><a href="/static/snippet.html" />snippet</a></li>
       </ul>
       <li>/uuids for specifying individual articles to be included Audio Articles</li>
       <ul>
         <li><a href="/uuids" />list all uuids</a></li>
-        <li><a href="/uuids/add/UUID-GOES-HERE" />add a uuid (edit the url)</a></li>
+        <li><a href="/uuids/add/5b48de66-4ad4-11e7-a3f4-c742b9791d43" />add a uuid (edit the url)</a></li>
         <li><a href="/uuids/clear" />delete all uuids</a></li>
       </ul>
       <li>/content for fetching content</li>
       <ul>
         <li><a href="/content/rssItems?url=RSS_URL_GOES_HERE" />fetch RSS feed, return items (edit the url)</a></li>
-        <li><a href="/content/article/UUID-GOES-HERE" />fetch an article (edit the url)</a></li>
-        <li><a href="/content/articleAsItem/UUID-GOES-HERE" />fetch an article, convert to item (edit the url)</a></li>
+        <li><a href="/content/article/5b48de66-4ad4-11e7-a3f4-c742b9791d43" />fetch an article (edit the url)</a></li>
+        <li><a href="/content/articleAsItem/5b48de66-4ad4-11e7-a3f4-c742b9791d43" />fetch an article, convert to item (edit the url)</a></li>
         <li><a href="/content/articlesAsItems" />fetch all articles from individual uuids</a></li>
+      </ul>
+      <li>/content/search</li>
+      <ul>
+        <li><a href="/content/search/5b48de66-4ad4-11e7-a3f4-c742b9791d43" />search for an article (edit the url)</a></li>
+        <li><a href="/content/searchLastFewFirstFt/2" />search for the last few firstFT articles (edit the url)</a></li>
+        <li><a href="/content/getLastFewFirstFtMentionedUuids/2" />search for the last few firstFT articles and the FT articles they in turn mention (edit the url)</a></li>
+      </ul>
+      <li>/podcast</li>
+      <ul>
+        <li><a href="/podcast/basedOnFirstFt/1/Amy" />/podcast/basedOnFirstFt/1/Amy</a> and any named UUIDs (edit the url)</li>
+        <li><a href="/podcast/basedOnFirstFt/1/Amy?skipFirstFtUuids=true" />/podcast/basedOnFirstFt/1/Amy</a> and any named UUIDs, with skipFirstFtUuids=true (edit the url)</li>
       </ul>
       <li>/validate for validating stuff</li>
       <ul>

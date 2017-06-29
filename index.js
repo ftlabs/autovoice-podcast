@@ -37,13 +37,33 @@ app.get('/podcast', (req, res) => {
   const voice  = req.query.voice;
   const token  = req.query.token;
 
-  if       ( ! token                 ) { res.status(400).send('This call requires a token parameter.'      ).end();
-  } else if( token !== PODCAST_TOKEN ) { res.status(401).send('This call requires a valid token parameter.').end();
-  } else if( ! voice                 ) { res.status(400).send('This call requires a voice parameter.'      ).end();
-  } else if( ! rssUrl                ) { res.status(400).send('This call requires a rss parameter.'        ).end();
-  } else if( ! validateUrl(rssUrl)   ) { res.status(400).send('This call requires a valid rss parameter.'  ).end();
+  if       ( ! token                 ) { res.status(400).send('This call requires a token parameter.'      );
+  } else if( token !== PODCAST_TOKEN ) { res.status(401).send('This call requires a valid token parameter.');
+  } else if( ! voice                 ) { res.status(400).send('This call requires a voice parameter.'      );
+  } else if( ! rssUrl                ) { res.status(400).send('This call requires a rss parameter.'        );
+  } else if( ! validateUrl(rssUrl)   ) { res.status(400).send('This call requires a valid rss parameter.'  );
   } else {
     autovoice.podcast(rssUrl, voice)
+    .then(feed => {
+      res.set('Content-Type', 'application/rss+xml');
+      res.send(feed);
+    })
+    ;
+  }
+});
+
+app.get('/podcastBasedOnFirstFt/:maxResults/:voice', (req, res) => {
+  const   maxResults = req.params.maxResults;
+  const       voice  = req.params.voice;
+  const requestedUrl = process.env.SERVER_ROOT + '/' + req.originalUrl;
+  const       token  = req.query.token;
+  const skipFirstFtUuids = req.query.skipFirstFtUuids;
+  const includeFirstFtUuids = !(skipFirstFtUuids == 'true');
+
+  if       ( ! token                 ) { res.status(400).send('This call requires a token parameter.'      ).end();
+  } else if( token !== PODCAST_TOKEN ) { res.status(401).send('This call requires a valid token parameter.').end();
+  } else {
+    autovoice.firstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUuids, voice)
     .then(feed => {
       res.set('Content-Type', 'application/rss+xml');
       res.send(feed);
@@ -66,8 +86,12 @@ app.get('/audio.mp3', (req, res) => {
   }
 });
 
-// these route *do* use s3o
-app.use(authS3O);
+if (process.env.NO_S3O === "true") {
+  // skip s3o
+} else {
+  // these route *do* use s3o
+  app.use(authS3O);
+}
 
 app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname + '/static/index.html'));
@@ -83,6 +107,16 @@ app.get('/format', (req, res) => {
     body = `${text}\n------\n${body}`;
   }
   res.send(body);
+});
+
+app.get('/formatArticleForReading/:uuid', (req, res) => {
+  fetchContent.articleAsItem(req.params.uuid)
+  .then( item => { return formatContentForReading.processText(item.content) } )
+  .then( text => { res.send( text ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
 });
 
 app.get('/snippet.mp3', (req, res) => {
@@ -158,7 +192,7 @@ app.get('/content/articleAsItem/:uuid', (req, res) => {
 });
 
 app.get('/content/articlesAsItems', (req, res) => {
-  fetchContent.articlesAsItems()
+  fetchContent.articlesAsItems( individualUUIDs.list() )
   .then( items => { res.json( items ); })
   .catch( err => {
     res.status(400).send( debug(err) ).end();
@@ -174,6 +208,50 @@ app.get('/validate', (req, res) => {
     isValid = validateUrl(req.query.url);
   }
   res.json( {isValid} );
+});
+
+//---
+
+app.get('/content/search/:uuid', (req, res) => {
+  fetchContent.searchByUUID(req.params.uuid)
+  .then( item => { res.json( item ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+app.get('/content/searchLastFewFirstFt/:maxResults', (req, res) => {
+  fetchContent.searchLastFewFirstFt(req.params.maxResults)
+  .then( item => { res.json( item ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+app.get('/content/getLastFewFirstFtMentionedUuids/:maxResults', (req, res) => {
+  fetchContent.getLastFewFirstFtMentionedUuids(req.params.maxResults)
+  .then( item => { res.json( item ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
+app.get('/podcast/basedOnFirstFt/:maxResults/:voice', (req, res) => {
+  const       maxResults = req.params.maxResults;
+  const           voice  = req.params.voice;
+  const     requestedUrl = process.env.SERVER_ROOT + '/' + req.originalUrl;
+  const skipFirstFtUuids = req.query.skipFirstFtUuids;
+  const includeFirstFtUuids = !(skipFirstFtUuids == 'true');
+
+  autovoice.firstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUuids, voice)
+  .then(feed => {
+    res.set('Content-Type', 'application/rss+xml');
+    res.send(feed);
+  })
+  ;
 });
 
 //---

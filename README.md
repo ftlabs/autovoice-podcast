@@ -13,6 +13,10 @@ More details
 
 # new end points
 
+* /podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN
+   * returns an RSS feed with MP3 of each item (aka a podcast), for the most recent few firstFT articles and all the FT articles they in turn refer to
+* /podcastBasedOnFirstFt/:maxResults/:voice?token=TOKEN&skipFirstFtUuids=true
+   * as above, but without the firstFT articles
 * /podcast?token=TOKEN&voice=VOICE_ID&rss=URL_OF_ARTICLE_RSS_FEED
    * return full podcast feed, including refs to mp3 files
    * VOICE_ID needs to match one of the known voices
@@ -50,3 +54,4 @@ These are for local builds:
    * to use when constructing the podcast feed
    * e.g. when developing locally, http://localhost:8060
 * DEBUG=autovoice:\*,bin:lib:\*
+* NO_S3O=true # if you want to skip the s3o step when building locally

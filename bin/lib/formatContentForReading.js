@@ -36,6 +36,7 @@ const REPLACEMENT_PAIRS = [
 	['N Korea',  'North Korea'],
 	['WaPo',     'wa po'],
 	['S&amp;P',  'S and P'],
+	["Donald Trump’s", "Donald Trumps"],
 	['Donald Trump', 'Donald Trump,'],
 	['Ms',       'Ms.'],
 	['firstFT',       'first FT'],
