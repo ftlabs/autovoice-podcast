@@ -52,7 +52,7 @@ module.exports = function(rssUrl, items) {
 		`<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">`,
     `<channel>`,
 			element('title', 'Automated Voices'),
-			element('link', rssUrl),
+			element('link', rssUrl.replace(/&/g, '&amp;')),
 			element('description', 'A Podcast/RSS feed of automated voices of FT articles, based on an RSS feed of article content'),
 			element('generator', 'FT Labs autovoice-podcast'),
 			element('docs', 'http://blogs.law.harvard.edu/tech/rss'),
