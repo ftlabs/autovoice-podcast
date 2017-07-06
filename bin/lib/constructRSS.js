@@ -1,5 +1,6 @@
-const debug = require('debug')('bin:lib:constructRSS');
-const   RSS = require('rss');
+const  debug = require('debug')('bin:lib:constructRSS');
+const    RSS = require('rss');
+const moment = require('moment');
 
 const validateUrl = require('./validate-url');
 
@@ -23,19 +24,7 @@ function pubdate(date) {
     date = new Date();
   }
 
-  var pieces     = date.toString().split(' '),
-      offsetTime = pieces[5].match(/[-+]\d{4}/),
-      offset     = (offsetTime) ? offsetTime : pieces[5],
-      parts      = [
-        pieces[0] + ',',
-        pieces[2],
-        pieces[1],
-        pieces[3],
-        pieces[4],
-        offset
-      ];
-
-  return parts.join(' ');
+	return moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ');
 }
 
 function cdatifyElement(element, text){
@@ -69,7 +58,7 @@ module.exports = function(rssUrl, items) {
 					cdatifyElement('title', item.title),
 					cdatifyElement('link', SERVER_ROOT + '/audio.mp3?' + item.fileId),
 					cdatifyElement('description', 'deliberately left blank'),
-					element('pubDate', item.pubdate),
+					element('pubDate', pubdate(item.pubdate)),
 					`<guid isPermaLink="true"><![CDATA[${item.guid}]]></guid>`,
 				`</item>`,
 			]);
