@@ -6,10 +6,9 @@ if (! process.env.hasOwnProperty('TOKEN')) {
 }
 
 module.exports = (req, res, next) => {
+  debug(`Checking auth to access endpoint`);
 
-	const passedToken = req.headers.token;
-
-	debug(`Checking if token is valid`);
+	const passedToken = (req.headers.token)? req.headers.token : req.query.token;
 
 	if(passedToken === undefined){
 		debug(`No token has been passed to service. Falling through to S3O`);
@@ -18,6 +17,7 @@ module.exports = (req, res, next) => {
 		debug(`Token was valid`);
 		next();
 	} else {
+    debug(`Token was invalid`);
 		res.status(401);
 		res.json({
 			status : 'err',
