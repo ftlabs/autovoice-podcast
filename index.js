@@ -249,21 +249,6 @@ app.get('/content/getLastFewFirstFtMentionedUuids/:maxResults', (req, res) => {
   ;
 });
 
-// app.get('/podcast/basedOnFirstFt/:maxResults/:voice', (req, res) => {
-//   const       maxResults = req.params.maxResults;
-//   const           voice  = req.params.voice;
-//   const     requestedUrl = process.env.SERVER_ROOT + '/' + req.originalUrl;
-//   const skipFirstFtUuids = req.query.skipFirstFtUuids;
-//   const includeFirstFtUuids = !(skipFirstFtUuids == 'true');
-//
-//   autovoice.firstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUuids, voice)
-//   .then(feed => {
-//     res.set('Content-Type', 'application/rss+xml');
-//     res.send(feed);
-//   })
-//   ;
-// });
-
 //---
 
 app.listen(process.env.PORT, function(){
