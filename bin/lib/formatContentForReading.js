@@ -41,7 +41,7 @@ const ELEMENT_REMOVALS_PATERN = [
 ].join('');
 const ELEMENT_REMOVALS_REGEXP = new RegExp(ELEMENT_REMOVALS_PATERN, 'ig');
 
-const REPLACEMENT_PAIRS = [ // replace 1st with 2nd
+const REPLACEMENT_WORD_PAIRS = [ // replace 1st with 2nd
 	['per cent', 'percent'],
 	['N Korea',  'North Korea'],
 	['WaPo',     'wa po'],
@@ -51,8 +51,15 @@ const REPLACEMENT_PAIRS = [ // replace 1st with 2nd
 	['Ms',       'Ms.'],
 	['firstFT',  'first FT'],
 ];
-const REPLACEMENT_PATTERN_PAIRS = REPLACEMENT_PAIRS.map(
+const REPLACEMENT_WORD_PAIRS_PATTERN = REPLACEMENT_WORD_PAIRS.map(
 	r => { return [new RegExp(`\\b${r[0]}\\b`, 'ig'), r[1]]; }
+);
+
+const REPLACEMENT_TEXT_PAIRS = [ // replace 1st with 2nd
+	['-a-', ' a '], // e.g. "€60bn-a-month", yes really
+];
+const REPLACEMENT_TEXT_PAIRS_PATTERN = REPLACEMENT_TEXT_PAIRS.map(
+	r => { return [new RegExp(`${r[0]}`, 'ig'), r[1]]; }
 );
 
 function processText(rawContent) {
@@ -77,8 +84,12 @@ function processText(rawContent) {
 
 	content = content.replace(TEXT_REMOVALS_REGEXP, ' ');
 
-	for( let rpp of REPLACEMENT_PATTERN_PAIRS ) {
-		content = content.replace( rpp[0], rpp[1] );
+	for( let r of REPLACEMENT_TEXT_PAIRS_PATTERN ) {
+		content = content.replace( r[0], r[1] );
+	}
+
+	for( let r of REPLACEMENT_WORD_PAIRS_PATTERN ) {
+		content = content.replace( r[0], r[1] );
 	}
 
 	content = content
