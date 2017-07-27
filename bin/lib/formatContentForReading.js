@@ -1,7 +1,7 @@
 const     debug = require('debug')('bin:lib:formatContentForReading');
 const striptags = require('striptags');
 
-const ACRONYMS = [
+const ACRONYMS = [ // to be expanded: e.g. "BBC" --> "B B C"
 	'BBC',
 	'CEO',
 	'CIO',
@@ -23,15 +23,25 @@ const ACRONYMS = [
 const ACRONYMS_PATTERN = `\\b(${ACRONYMS.join('|') })\\b`;
 const ACRONYMS_REGEXP  = new RegExp(ACRONYMS_PATTERN, 'g');
 
-const REMOVALS = [
+const TEXT_REMOVALS = [ // to be snipped out
 	'Sign up to receive FirstFT by email here',
 	'Test your knowledge with the week in news quiz',
 	'Follow [^:]+ on Twitter: @[a-zA-Z0-9\-_]+'
 ];
-const REMOVALS_PATTERN = `\\b(${REMOVALS.join('|') })\\b`;
-const REMOVALS_REGEXP = new RegExp(REMOVALS_PATTERN, 'ig');
+const TEXT_REMOVALS_PATTERN = `\\b(${TEXT_REMOVALS.join('|') })\\b`;
+const TEXT_REMOVALS_REGEXP = new RegExp(TEXT_REMOVALS_PATTERN, 'ig');
 
-const REPLACEMENT_PAIRS = [
+const ELEMENT_REMOVALS = [ // <element>...</element> to be snipped out
+	'ft-related',
+];
+const ELEMENT_REMOVALS_PATERN = [
+	'(',
+	ELEMENT_REMOVALS.map(element => { return `<${element}\\b[\\s\\S]*?</${element}>`; }).join('|'), // http://www.regular-expressions.info/dot.html
+	')',
+].join('');
+const ELEMENT_REMOVALS_REGEXP = new RegExp(ELEMENT_REMOVALS_PATERN, 'ig');
+
+const REPLACEMENT_PAIRS = [ // replace 1st with 2nd
 	['per cent', 'percent'],
 	['N Korea',  'North Korea'],
 	['WaPo',     'wa po'],
@@ -39,7 +49,7 @@ const REPLACEMENT_PAIRS = [
 	["Donald Trump’s", "Donald Trumps"],
 	['Donald Trump', 'Donald Trump,'],
 	['Ms',       'Ms.'],
-	['firstFT',       'first FT'],
+	['firstFT',  'first FT'],
 ];
 const REPLACEMENT_PATTERN_PAIRS = REPLACEMENT_PAIRS.map(
 	r => { return [new RegExp(`\\b${r[0]}\\b`, 'ig'), r[1]]; }
@@ -48,6 +58,7 @@ const REPLACEMENT_PATTERN_PAIRS = REPLACEMENT_PAIRS.map(
 function processText(rawContent) {
 
 	let content = rawContent
+	.replace(ELEMENT_REMOVALS_REGEXP, ' ') // replace the matched open/close elements with a space
 	.replace(/<\/?(p|p [^>]*)>/g, '. ') // replace P tags with dots to contribute to punctuation
 	;
 
@@ -64,7 +75,7 @@ function processText(rawContent) {
 		content = content.replace(/\.\s+\(([a-zA-Z, ]+)\s*,\s*([a-zA-Z ]+)\)/g, (match, p1, p2) => { return `. (as reported by ${p1}, and ${p2}). `; });
 	}
 
-	content = content.replace(REMOVALS_REGEXP, ' ');
+	content = content.replace(TEXT_REMOVALS_REGEXP, ' ');
 
 	for( let rpp of REPLACEMENT_PATTERN_PAIRS ) {
 		content = content.replace( rpp[0], rpp[1] );
