@@ -117,6 +117,32 @@ function generateFirstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUui
 	;
 }
 
+function generateListBasedPodcast(requestedUrl, voiceId=tts.defaultVoiceId){
+	debug(`generateListBasedPodcast: voiceId=${voiceId}`);
+	const defaultUUID = 'fb705712-3be7-11e7-821a-6027b8a20f23';
+
+	return Promise.resolve( individualUUIDs.list() )
+	.then( uuids => {
+		debug(`generateListBasedPodcast: uuids.length=${uuids.length}`);
+		if (uuids.length == 0) {
+			debug(`generateListBasedPodcast: empty uuids list, so using defaultUUID=${defaultUUID}`);
+			uuids = [defaultUUID];
+		}
+		return uuids;
+	})
+	.then( uuids => fetchContent.articlesAsItems( uuids ) )
+	.then( items => {
+		debug(`generateListBasedPodcast: items.length=${items.length}`);
+		const promises = items.map( (item, i) => {
+			item.processingIndex = i;
+			return processItemToMp3(item, voiceId);
+		} );
+		return Promise.all(promises);
+	})
+	.then( items => constructRSS(requestedUrl, items) )
+	;
+}
+
 function getMp3(fileId){
 	const itemData = dataItemsCache.retrieve(fileId);
 	if ( itemData ) {
@@ -158,8 +184,9 @@ function getSnippetMp3(snippet, voiceId){
 }
 
 module.exports = {
-	podcast : generatePodcast,
-	mp3     : getMp3,
-	snippetMp3 : getSnippetMp3,
+	podcast            : generatePodcast,
+	mp3                : getMp3,
+	snippetMp3         : getSnippetMp3,
 	firstFtBasedPodcast: generateFirstFtBasedPodcast,
+	listBasedPodcast   : generateListBasedPodcast,
 };
