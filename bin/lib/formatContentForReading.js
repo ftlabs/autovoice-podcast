@@ -34,12 +34,12 @@ const TEXT_REMOVALS_REGEXP = new RegExp(TEXT_REMOVALS_PATTERN, 'ig');
 const ELEMENT_REMOVALS = [ // <element>...</element> to be snipped out
 	'ft-related',
 ];
-const ELEMENT_REMOVALS_PATERN = [
+const ELEMENT_REMOVALS_PATTERN = [
 	'(',
 	ELEMENT_REMOVALS.map(element => { return `<${element}\\b[\\s\\S]*?</${element}>`; }).join('|'), // http://www.regular-expressions.info/dot.html
 	')',
 ].join('');
-const ELEMENT_REMOVALS_REGEXP = new RegExp(ELEMENT_REMOVALS_PATERN, 'ig');
+const ELEMENT_REMOVALS_REGEXP = new RegExp(ELEMENT_REMOVALS_PATTERN, 'ig');
 
 const REPLACEMENT_WORD_PAIRS = [ // replace 1st with 2nd
 	['per cent', 'percent'],
