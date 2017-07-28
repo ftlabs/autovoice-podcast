@@ -75,7 +75,7 @@ function search(params) {
 		};
 	} )
 	.catch(err => {
-		debug(`ERROR: search: err=${err},\n`);
+		debug(`ERROR: search: err=${err}, params=${JSON.stringify(params)}`);
 		throw err;
 	} )
 	;
