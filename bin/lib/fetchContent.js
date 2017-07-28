@@ -112,10 +112,20 @@ function getLastFewFirstFtMentionedUuids(maxResults, includeFirstFtUuids=false) 
 	return searchLastFewFirstFt(maxResults)
 	.then( searchObj => extractFirstFtIds(searchObj.sapiObj) )
 	.then( firstFtUuids => {
-		const promises = firstFtUuids.map(uuid => {return article(uuid);});
+		const promises = firstFtUuids.map(uuid => {
+			return article(uuid)
+			.catch( err => {
+				debug(`ERROR: getLastFewFirstFtMentionedUuids: article uuid=${uuid}, err=${err}`);
+				return null;
+			})
+			;
+		});
 		const uuids = (includeFirstFtUuids)? firstFtUuids : [];
 
 		return Promise.all(promises)
+		.then( articles => {
+			return articles.filter(a => {return a !== null;});
+		})
 		.then(articles => articles.map(article => {return article.bodyXML;} ) )
 		.then(bodyXMLs => bodyXMLs.join('') )
 		.then(bodyXML => {
@@ -174,6 +184,7 @@ function article(uuid) {
 	.then( text  => JSON.parse(text) )
 	.catch( err => {
 		debug(`ERROR: article: err=${err}, capiUrl=${capiUrl}`);
+		throw err;
 	})
 	;
 }
@@ -193,18 +204,27 @@ function parseArticleJsonToItem( json ){
 	return itemData;
 }
 
+// return null if there was an error with the article, or the parsing
 function articleAsItem(uuid) {
 	return article(uuid)
-	.then( json  => parseArticleJsonToItem(json) )
+	.catch( err => {
+		debug(`ERROR: articleAsItem: from article err=${err}, uuid=${uuid}`);
+		throw err;
+	})
+	.then( json => parseArticleJsonToItem(json) )
 	.catch( err => {
 		debug(`ERROR: articleAsItem: err=${err}, uuid=${uuid}`);
+		return null;
 	})
 	;
 }
 
 function articlesAsItems(uuids) {
 	const promises = uuids.map(articleAsItem);
-	return Promise.all( promises );
+	return Promise.all( promises )
+	.then( outputs => {
+		return outputs.filter( op => {return op !== null;});
+	});
 }
 
 module.exports = {
