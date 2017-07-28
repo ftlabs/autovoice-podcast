@@ -121,10 +121,17 @@ app.get('/format', (req, res) => {
 
 app.get('/formatArticleForReading/:uuid', (req, res) => {
   fetchContent.articleAsItem(req.params.uuid)
+  .then( item => {
+    if (item == null) {
+      throw `/formatArticleForReading/${req.params.uuid}: item==null, which probably means the CAPI lookup failed.`;
+    }
+    return item;
+  })
   .then( item => { return formatContentForReading.processText(item.content) } )
   .then( text => { res.send( text ); })
   .catch( err => {
-    res.status(400).send( debug(err) ).end();
+    debug(`/formatArticleForReading/:uuid: err=${err}`);
+    res.status(400).send( err.toString() ).end();
 	})
   ;
 });
