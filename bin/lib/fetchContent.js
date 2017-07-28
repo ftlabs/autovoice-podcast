@@ -74,6 +74,10 @@ function search(params) {
 			sapiObj : JSON.parse(text)
 		};
 	} )
+	.catch(err => {
+		debug(`ERROR: search: err=${err}, params=${JSON.stringify(params)}`);
+		throw err;
+	} )
 	;
 }
 
@@ -161,10 +165,16 @@ function article(uuid) {
 
 	return fetch(capiUrl)
 	.then( res   => res.text() )
+	.then( text => {
+		if (text.startsWith('Forbidden')) {
+			throw `ERROR: fetch article for uuid=${uuid}, text startsWth Forbidden, text=${text}`;
+		}
+		return text;
+	})
 	.then( text  => JSON.parse(text) )
-	// .catch( err => {
-	// 	debug(err);
-	// })
+	.catch( err => {
+		debug(`ERROR: article: err=${err}, capiUrl=${capiUrl}`);
+	})
 	;
 }
 
@@ -186,9 +196,9 @@ function parseArticleJsonToItem( json ){
 function articleAsItem(uuid) {
 	return article(uuid)
 	.then( json  => parseArticleJsonToItem(json) )
-	// .catch( err => {
-	// 	debug(err);
-	// })
+	.catch( err => {
+		debug(`ERROR: articleAsItem: err=${err}, uuid=${uuid}`);
+	})
 	;
 }
 
