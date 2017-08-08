@@ -46,6 +46,7 @@ const REPLACEMENT_WORD_PAIRS = [ // replace 1st with 2nd
 	['N Korea',  'North Korea'],
 	['WaPo',     'wa po'],
 	['S&amp;P',  'S and P'],
+	['R&amp;B',  'R an B'],
 	["Donald Trump’s", "Donald Trumps"],
 	['Donald Trump', 'Donald Trump,'],
 	['Ms',       'Ms.'],
