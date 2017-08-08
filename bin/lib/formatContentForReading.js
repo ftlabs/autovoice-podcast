@@ -67,6 +67,7 @@ function processText(rawContent) {
 	let content = rawContent
 	.replace(ELEMENT_REMOVALS_REGEXP, ' ') // replace the matched open/close elements with a space
 	.replace(/<\/?(p|p [^>]*)>/g, '. ') // replace P tags with dots to contribute to punctuation
+	.replace(/<\/?(li|li [^>]*)>/g, '. ') // replace li tags with dots to contribute to punctuation
 	;
 
 	content = striptags( content )
