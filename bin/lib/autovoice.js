@@ -9,6 +9,7 @@ const            constructRSS = require('./constructRSS');
 const formatContentForReading = require('./formatContentForReading');
 const            fetchContent = require('./fetchContent');
 const         individualUUIDs = require('./individualUUIDs');
+const         filterNullItems = require('./filter-null');
 
 function processItemToMp3(item, voiceId){
 	debug(`processItemToMp3: index=${item.processingIndex}, item.keys=${JSON.stringify(Object.keys(item))}, voiceId=${voiceId}`);
@@ -88,10 +89,16 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 		debug(`generatePodcast: items.length=${items.length}`);
 		const promises = items.map( (item, i) => {
 			item.processingIndex = i;
-			return processItemToMp3(item, voiceId);
+			return processItemToMp3(item, voiceId)
+				.catch(err => {
+					debug(`An error occurred trying to generate speech for item ${item.uuid}. Err:`, err);
+					return null;
+				})
+			;
 		} );
 		return Promise.all(promises);
 	})
+	.then( items => filterNullItems(items) )
 	.then( items => {
 		const feed = constructRSS(rssUrl, items);
 		return feed;
@@ -109,10 +116,16 @@ function generateFirstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUui
 		debug(`generateFirstFtBasedPodcast: items.length=${items.length}`);
 		const promises = items.map( (item, i) => {
 			item.processingIndex = i;
-			return processItemToMp3(item, voiceId);
+			return processItemToMp3(item, voiceId)
+				.catch(err => {
+					debug(`An error occurred trying to generate speech for item ${item.uuid}. Err:`, err);
+					return null;
+				})
+			;
 		} );
 		return Promise.all(promises);
 	})
+	.then( items => filterNullItems(items) )	
 	.then( items => constructRSS(requestedUrl, items) )
 	;
 }

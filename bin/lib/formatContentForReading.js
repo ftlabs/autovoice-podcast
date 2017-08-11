@@ -110,6 +110,10 @@ function wrap(itemData) {
 
 	let texts = [];
 
+	if(itemData.content === undefined){
+		throw 'itemData.content is undefined. There is nothing to read aloud.';
+	}
+
 	texts.push(`This article is narrated by Experimental ${itemData.voiceId}.`);
 	texts.push( itemData.content + '.' );
 
