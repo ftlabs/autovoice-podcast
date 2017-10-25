@@ -9,6 +9,7 @@ const            constructRSS = require('./constructRSS');
 const formatContentForReading = require('./formatContentForReading');
 const            fetchContent = require('./fetchContent');
 const         individualUUIDs = require('./individualUUIDs');
+const                directly = require('./directly');
 
 function processItemToMp3(item, voiceId){
 	debug(`processItemToMp3: index=${item.processingIndex}, item.keys=${JSON.stringify(Object.keys(item))}, voiceId=${voiceId}`);
@@ -107,11 +108,25 @@ function generateFirstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUui
 	.then( uuids => fetchContent.articlesAsItems( uuids ) )
 	.then( items => {
 		debug(`generateFirstFtBasedPodcast: items.length=${items.length}`);
-		const promises = items.map( (item, i) => {
-			item.processingIndex = i;
-			return processItemToMp3(item, voiceId);
-		} );
-		return Promise.all(promises);
+		// const promises = items.map( (item, i) => {
+		// 	item.processingIndex = i;
+		// 	return processItemToMp3(item, voiceId);
+		// } );
+		// return Promise.all(promises);
+
+		// trying Rhys' https://github.com/wheresrhys/directly
+
+		const itemPromisers = items.map( (item, i) => {
+			return function () {
+				item.processingIndex = i;
+				return processItemToMp3(item, voiceId);
+			};
+		});
+
+		return itemPromisers;
+	})
+	.then( itemPromisers => {
+		return directly(1, itemPromisers).run();
 	})
 	.then( items => constructRSS(requestedUrl, items) )
 	;
