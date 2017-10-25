@@ -100,18 +100,7 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 		fetchContent.articlesAsItems( individualUUIDs.list() ),
 	])
 	.then( itemLists => [].concat.apply([], itemLists) ) // flatten the list of lists of items into a combined list of items
-	.then( items => {
-		debug(`generatePodcast: items.length=${items.length}`);
-		const promises = items.map( (item, i) => {
-			item.processingIndex = i;
-			return processItemToMp3(item, voiceId);
-		} );
-		return Promise.all(promises);
-	})
-	.then( items => {
-		const feed = constructRSS(rssUrl, items);
-		return feed;
-	})
+	.then( items => generateThrottledRSSFromItems( rssUrl, voiceId, items ) )
 	;
 }
 
@@ -139,15 +128,7 @@ function generateListBasedPodcast(requestedUrl, voiceId=tts.defaultVoiceId){
 		return uuids;
 	})
 	.then( uuids => fetchContent.articlesAsItems( uuids ) )
-	.then( items => {
-		debug(`generateListBasedPodcast: items.length=${items.length}`);
-		const promises = items.map( (item, i) => {
-			item.processingIndex = i;
-			return processItemToMp3(item, voiceId);
-		} );
-		return Promise.all(promises);
-	})
-	.then( items => constructRSS(requestedUrl, items) )
+	.then( items => generateThrottledRSSFromItems( requestedUrl, voiceId, items ) )
 	;
 }
 
