@@ -10,6 +10,7 @@ const formatContentForReading = require('./formatContentForReading');
 const            fetchContent = require('./fetchContent');
 const         individualUUIDs = require('./individualUUIDs');
 const                directly = require('./directly');
+const         TTS_CONCURRENCE = (process.env.hasOwnProperty(TTS_CONCURRENCE))? process.env.TTS_CONCURRENCE : 4;
 
 function processItemToMp3(item, voiceId){
 	debug(`processItemToMp3: index=${item.processingIndex}, item.keys=${JSON.stringify(Object.keys(item))}, voiceId=${voiceId}`);
@@ -107,7 +108,7 @@ function generateFirstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUui
 	.then( firstFtBasedUuids => firstFtBasedUuids.concat(individualUUIDs.list()) )
 	.then( uuids => fetchContent.articlesAsItems( uuids ) )
 	.then( items => {
-		debug(`generateFirstFtBasedPodcast: items.length=${items.length}`);
+		debug(`generateFirstFtBasedPodcast: items.length=${items.length}, TTS_CONCURRENCE=${TTS_CONCURRENCE}`);
 		// const promises = items.map( (item, i) => {
 		// 	item.processingIndex = i;
 		// 	return processItemToMp3(item, voiceId);
@@ -126,7 +127,7 @@ function generateFirstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUui
 		return itemPromisers;
 	})
 	.then( itemPromisers => {
-		return directly(1, itemPromisers).run();
+		return directly(TTS_CONCURRENCE, itemPromisers);
 	})
 	.then( items => constructRSS(requestedUrl, items) )
 	;
