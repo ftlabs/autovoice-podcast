@@ -6,6 +6,9 @@ const debug = require('debug')('bin:lib:fetchContent');
 const     extractUuid = require('./extract-uuid');
 const    parseRSSFeed = require('./parse-rss-feed');
 
+const directly = require('./directly'); 	// trying Rhys' https://github.com/wheresrhys/directly
+const CAPI_CONCURRENCE = (process.env.hasOwnProperty('CAPI_CONCURRENCE'))? process.env.CAPI_CONCURRENCE : 10;
+
 const CAPI_KEY = process.env.CAPI_KEY;
 if (! CAPI_KEY ) {
 	throw new Error('ERROR: CAPI_KEY not specified in env');
@@ -220,11 +223,17 @@ function articleAsItem(uuid) {
 }
 
 function articlesAsItems(uuids) {
-	const promises = uuids.map(articleAsItem);
-	return Promise.all( promises )
-	.then( outputs => {
-		return outputs.filter( op => {return op !== null;});
+	debug(`articlesAsItems: uuids.length=${uuids.length}, CAPI_CONCURRENCE=${CAPI_CONCURRENCE}`);
+
+	const articlePromisers = uuids.map( uuid => {
+		return function () {
+			return articleAsItem(uuid);
+		};
 	});
+
+	return directly(CAPI_CONCURRENCE, articlePromisers)
+	.then( outputs => outputs.filter( op => {return op !== null;}) )
+	;
 }
 
 module.exports = {

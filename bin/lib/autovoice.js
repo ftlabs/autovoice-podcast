@@ -9,6 +9,8 @@ const            constructRSS = require('./constructRSS');
 const formatContentForReading = require('./formatContentForReading');
 const            fetchContent = require('./fetchContent');
 const         individualUUIDs = require('./individualUUIDs');
+const                directly = require('./directly'); 	// trying Rhys' https://github.com/wheresrhys/directly
+const         TTS_CONCURRENCE = (process.env.hasOwnProperty('TTS_CONCURRENCE'))? process.env.TTS_CONCURRENCE : 4;
 
 function processItemToMp3(item, voiceId){
 	debug(`processItemToMp3: index=${item.processingIndex}, item.keys=${JSON.stringify(Object.keys(item))}, voiceId=${voiceId}`);
@@ -75,6 +77,20 @@ function processItemToMp3(item, voiceId){
 		});
 	}
 }
+function generateThrottledRSSFromItems( rssUrl, voiceId, items ){
+	debug(`generateThrottledRSSFromItems: rssUrl=${rssUrl}, voiceId=${voiceId}, items.length=${items.length}, TTS_CONCURRENCE=${TTS_CONCURRENCE}`);
+
+	const itemPromisers = items.map( (item, i) => {
+		return function () {
+			item.processingIndex = i;
+			return processItemToMp3(item, voiceId);
+		};
+	});
+
+	return directly(TTS_CONCURRENCE, itemPromisers)
+		.then( items => constructRSS(rssUrl, items) )
+	;
+}
 
 function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 	debug(`generatePodcast: rssUrl=${rssUrl}, voiceId=${voiceId}`);
@@ -84,18 +100,7 @@ function generatePodcast(rssUrl, voiceId=tts.defaultVoiceId){
 		fetchContent.articlesAsItems( individualUUIDs.list() ),
 	])
 	.then( itemLists => [].concat.apply([], itemLists) ) // flatten the list of lists of items into a combined list of items
-	.then( items => {
-		debug(`generatePodcast: items.length=${items.length}`);
-		const promises = items.map( (item, i) => {
-			item.processingIndex = i;
-			return processItemToMp3(item, voiceId);
-		} );
-		return Promise.all(promises);
-	})
-	.then( items => {
-		const feed = constructRSS(rssUrl, items);
-		return feed;
-	})
+	.then( items => generateThrottledRSSFromItems( rssUrl, voiceId, items ) )
 	;
 }
 
@@ -105,15 +110,7 @@ function generateFirstFtBasedPodcast(maxResults, requestedUrl, includeFirstFtUui
 	return fetchContent.getLastFewFirstFtMentionedUuids(maxResults, includeFirstFtUuids)
 	.then( firstFtBasedUuids => firstFtBasedUuids.concat(individualUUIDs.list()) )
 	.then( uuids => fetchContent.articlesAsItems( uuids ) )
-	.then( items => {
-		debug(`generateFirstFtBasedPodcast: items.length=${items.length}`);
-		const promises = items.map( (item, i) => {
-			item.processingIndex = i;
-			return processItemToMp3(item, voiceId);
-		} );
-		return Promise.all(promises);
-	})
-	.then( items => constructRSS(requestedUrl, items) )
+	.then( items => generateThrottledRSSFromItems( requestedUrl, voiceId, items ) )
 	;
 }
 
@@ -131,15 +128,7 @@ function generateListBasedPodcast(requestedUrl, voiceId=tts.defaultVoiceId){
 		return uuids;
 	})
 	.then( uuids => fetchContent.articlesAsItems( uuids ) )
-	.then( items => {
-		debug(`generateListBasedPodcast: items.length=${items.length}`);
-		const promises = items.map( (item, i) => {
-			item.processingIndex = i;
-			return processItemToMp3(item, voiceId);
-		} );
-		return Promise.all(promises);
-	})
-	.then( items => constructRSS(requestedUrl, items) )
+	.then( items => generateThrottledRSSFromItems( requestedUrl, voiceId, items ) )
 	;
 }
 

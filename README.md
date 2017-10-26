@@ -49,6 +49,11 @@ The following are mandatory params, the absence of which will kill the app on st
 * TOKEN=...
 * CAPI_KEY=...
 
+Config params (non mandatory)
+
+* TTS_CONCURRENCE=... (default 4) max num of concurrent requests to the TTS service
+* CAPI_CONCURRENCE=... (default 10) max num of concurrent requests to the CAPI service
+
 These are for local builds:
 
 * SERVER_ROOT=TRANSPORT_AND_DOMAIN_OF_SERVICE
