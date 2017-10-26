@@ -223,12 +223,6 @@ function articleAsItem(uuid) {
 }
 
 function articlesAsItems(uuids) {
-	// const promises = uuids.map(articleAsItem);
-	// return Promise.all( promises )
-	// .then( outputs => {
-	// 	return outputs.filter( op => {return op !== null;});
-	// });
-
 	debug(`articlesAsItems: uuids.length=${uuids.length}, CAPI_CONCURRENCE=${CAPI_CONCURRENCE}`);
 
 	const articlePromisers = uuids.map( uuid => {
