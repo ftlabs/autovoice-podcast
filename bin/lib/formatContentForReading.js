@@ -41,12 +41,10 @@ const ELEMENT_REMOVALS_PATTERN = [
 ].join('');
 const ELEMENT_REMOVALS_REGEXP = new RegExp(ELEMENT_REMOVALS_PATTERN, 'ig');
 
-const REPLACEMENT_WORD_PAIRS = [ // replace 1st with 2nd
+const REPLACEMENT_WORD_PAIRS = [ // replace 1st with 2nd, NB wraps 1st in word breaks
 	['per cent', 'percent'],
 	['N Korea',  'North Korea'],
 	['WaPo',     'wa po'],
-	['S&amp;P',  'S and P'],
-	['R&amp;B',  'R an B'],
 	["Donald Trump’s", "Donald Trumps"],
 	['Donald Trump', 'Donald Trump,'],
 	['Ms',       'Ms.'],
@@ -56,8 +54,9 @@ const REPLACEMENT_WORD_PAIRS_PATTERN = REPLACEMENT_WORD_PAIRS.map(
 	r => { return [new RegExp(`\\b${r[0]}\\b`, 'ig'), r[1]]; }
 );
 
-const REPLACEMENT_TEXT_PAIRS = [ // replace 1st with 2nd
+const REPLACEMENT_TEXT_PAIRS = [ // replace 1st with 2nd, NB purely based on text match, with no care about word breaks
 	['-a-', ' a '], // e.g. "€60bn-a-month", yes really
+	['&amp;',  ' and '],
 ];
 const REPLACEMENT_TEXT_PAIRS_PATTERN = REPLACEMENT_TEXT_PAIRS.map(
 	r => { return [new RegExp(`${r[0]}`, 'ig'), r[1]]; }
