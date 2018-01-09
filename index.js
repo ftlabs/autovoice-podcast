@@ -136,6 +136,8 @@ app.get('/formatArticleForReading/:uuid', (req, res) => {
   ;
 });
 
+const AWS_POLLY_CHAR_MAX = 1500;
+
 app.get('/snippet.mp3', (req, res) => {
   let   text  = req.query.text;
   const voice = req.query.voice;
@@ -151,11 +153,17 @@ app.get('/snippet.mp3', (req, res) => {
     text = formatContentForReading.wrapAndProcessItemData(itemData);
   }
 
-  autovoice.snippetMp3(text, voice)
-  .then(mp3Content => {
-    res.set('Content-Type', 'audio/mpeg');
-    res.send(mp3Content);
-  })
+  if (text.length > AWS_POLLY_CHAR_MAX) {
+    const errText = `Error: Snippet text too large at ${text.length} chars. There is a ${AWS_POLLY_CHAR_MAX} char limit in AWS Polly.`;
+    console.error(errText);
+    res.status(400).send(errText);
+  } else {
+    autovoice.snippetMp3(text, voice)
+    .then(mp3Content => {
+      res.set('Content-Type', 'audio/mpeg');
+      res.send(mp3Content);
+    })
+  }
 });
 
 //--- access points to add/remove/list individual uuids for inclusion in Audio Articles

@@ -62,6 +62,22 @@ const REPLACEMENT_TEXT_PAIRS_PATTERN = REPLACEMENT_TEXT_PAIRS.map(
 	r => { return [new RegExp(`${r[0]}`, 'ig'), r[1]]; }
 );
 
+const PERMITTED_SSML_ELEMENTS = [
+	'speak',
+	'amazon:effect',
+	'audio',
+	'break',
+	'emphasis',
+	'p',
+	'phoneme',
+	'prosody',
+	's',
+	'say-as',
+	'speak',
+	'sub',
+	'w',
+];
+
 function processText(rawContent) {
 
 	let content = rawContent
@@ -70,7 +86,11 @@ function processText(rawContent) {
 	.replace(/<\/?(li|li [^>]*)>/g, '. ') // replace li tags with dots to contribute to punctuation
 	;
 
-	content = striptags( content )
+	const permittedElements = (content.match(/^\s*<speak>/))? PERMITTED_SSML_ELEMENTS : [];
+
+	console.log(`processText: permittedElements=${JSON.stringify(permittedElements)}, content=${content}`)
+
+	content = striptags( content, permittedElements, ' ')
 	.replace(/"/g,   "\'")       // convert speechmarks
 	.replace(/\\n/g, '\n')       // convert \\n
 	.replace(/\n+/g, ' ')        // convert newlines
