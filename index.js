@@ -149,16 +149,16 @@ app.get('/formatArticleForListening.mp3', (req, res) => {
   })
   .then( item => { return formatContentForReading.processText(item.content) } )
   .then( text => {
-		autovoice.snippetMp3(text, voice)
+    autovoice.snippetMp3(text, voice)
     .then(mp3Content => {
       res.set('Content-Type', 'audio/mpeg');
       res.send(mp3Content);
     })
-	 })
+   })
   .catch( err => {
     debug(`/formatArticleForListening.mp3?uuid=${uuid}voice=${voice}: err=${err}`);
     res.status(400).send( err.toString() ).end();
-	})
+  })
   ;
 });
 
