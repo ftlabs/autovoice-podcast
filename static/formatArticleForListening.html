@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>format text and run it via TTS</title>
+  </head>
+  <body>
+    <form action="/formatArticleForListening.mp3" methd="get">
+    Text:<br>
+    <input name="uuid" rows="4" cols="40" placeholder="Please enter the article uuid" size="42"></input>
+    Voice:
+    <select name="voice">
+      <option value="Emma">Emma (British)</option>
+      <option value="Amy">Amy (British)</option>
+      <option value="Brian">Brian (British)</option>
+      <option value="Geraint">Geraint (Welsh English)</option>
+      <option value="Nicole">Nicole (Australian)</option>
+      <option value="Russell">Russell (Australian)</option>
+      <option value="Raveena">Raveena (Indian English)</option>
+      <option value="Ivy">Ivy (US)</option>
+      <option value="Joanna">Joanna (US)</option>
+      <option value="Joey">Joey (US)</option>
+      <option value="Justin">Justin (US)</option>
+      <option value="Kendra">Kendra (US)</option>
+      <option value="Kimberly">Kimberly (US)</option>
+      <option value="Salli">Salli (US)</option>
+      <option value="Celine">Celine (French)</option>
+      <option value="Mathieu">Mathieu (French)</option>
+      <option value="Gwyneth">Gwyneth (Welsh)</option>
+      <option value="Hans">Hans (German)</option>
+      <option value="Marlene">Marlene (German)</option>
+    </select>
+    <input type="submit" value="Submit">
+  </form>
+  </body>
+</html>

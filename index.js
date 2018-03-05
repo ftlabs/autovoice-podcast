@@ -136,6 +136,32 @@ app.get('/formatArticleForReading/:uuid', (req, res) => {
   ;
 });
 
+app.get('/formatArticleForListening.mp3', (req, res) => {
+	const voice = req.query.voice;
+	const uuid = req.query.uuid;
+
+  fetchContent.articleAsItem(uuid)
+  .then( item => {
+    if (item == null) {
+      throw `/formatArticleForListening.mp3?uuid=${uuid}voice=${voice}: item==null, which probably means the CAPI lookup failed.`;
+    }
+    return item;
+  })
+  .then( item => { return formatContentForReading.processText(item.content) } )
+  .then( text => {
+    autovoice.snippetMp3(text, voice)
+    .then(mp3Content => {
+      res.set('Content-Type', 'audio/mpeg');
+      res.send(mp3Content);
+    })
+   })
+  .catch( err => {
+    debug(`/formatArticleForListening.mp3?uuid=${uuid}voice=${voice}: err=${err}`);
+    res.status(400).send( err.toString() ).end();
+  })
+  ;
+});
+
 const AWS_POLLY_CHAR_MAX = 1500;
 
 app.get('/snippet.mp3', (req, res) => {
