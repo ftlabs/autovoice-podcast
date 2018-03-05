@@ -143,7 +143,7 @@ app.get('/formatArticleForListening.mp3', (req, res) => {
   fetchContent.articleAsItem(uuid)
   .then( item => {
     if (item == null) {
-      throw `/formatArticleForReading/${req.params.uuid}: item==null, which probably means the CAPI lookup failed.`;
+      throw `/formatArticleForListening.mp3?uuid=${uuid}voice=${voice}: item==null, which probably means the CAPI lookup failed.`;
     }
     return item;
   })
@@ -156,7 +156,7 @@ app.get('/formatArticleForListening.mp3', (req, res) => {
     })
 	 })
   .catch( err => {
-    debug(`/formatArticleForListening.mp3?uuid=${uuid}&voice=${voice} err=${err}`);
+    debug(`/formatArticleForListening.mp3?uuid=${uuid}voice=${voice}: err=${err}`);
     res.status(400).send( err.toString() ).end();
 	})
   ;
