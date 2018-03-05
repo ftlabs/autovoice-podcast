@@ -29,6 +29,8 @@ More details
    * optional, &compare=yes (default=no)
    * returns processed text
    * to show how the text is munged before being passed to TTS
+* /formatArticleForListening.html
+   * a form which formats and returns MP3 article content based on the uuid inputted 
 * /static/format.html
    * a form which invokes the /format endpoint
 * /snippet.mp3?text=some words to be processed and spoken&voice=voiceId
