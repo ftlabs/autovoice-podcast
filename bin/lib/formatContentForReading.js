@@ -62,6 +62,22 @@ const REPLACEMENT_TEXT_PAIRS_PATTERN = REPLACEMENT_TEXT_PAIRS.map(
 	r => { return [new RegExp(`${r[0]}`, 'ig'), r[1]]; }
 );
 
+const PERMITTED_SSML_ELEMENTS = [
+	'speak',
+	'amazon:effect',
+	'audio',
+	'break',
+	'emphasis',
+	'p',
+	'phoneme',
+	'prosody',
+	's',
+	'say-as',
+	'speak',
+	'sub',
+	'w',
+];
+
 function processText(rawContent) {
 
 	let content = rawContent
@@ -70,13 +86,22 @@ function processText(rawContent) {
 	.replace(/<\/?(li|li [^>]*)>/g, '. ') // replace li tags with dots to contribute to punctuation
 	;
 
-	content = striptags( content )
-	.replace(/"/g,   "\'")       // convert speechmarks
+	const containsSpeak = content.match(/^\s*<speak>/);
+
+	const permittedElements = (containsSpeak)? PERMITTED_SSML_ELEMENTS : [];
+
+	console.log(`processText: permittedElements=${JSON.stringify(permittedElements)}, content=${content}`)
+
+	content = striptags( content, permittedElements, ' ')
 	.replace(/\\n/g, '\n')       // convert \\n
 	.replace(/\n+/g, ' ')        // convert newlines
 	.replace(/\.(\s*\.)+/g, '.') // compress multi dot and space combos
 	.replace(/\s+/g, ' ')        // compress multiple spaces
 	;
+
+	if (! containsSpeak) {
+		content = content.replace(/"/g,   "\'");      // convert speechmarks
+	}
 
 	if (content.match(/Sign up to receive FirstFT/)) {
 		content = content.replace(/\.\s+\(([a-zA-Z ]+)\)/g, (match, p1) => { return `. (as reported by ${p1}). `; });
