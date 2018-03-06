@@ -19,7 +19,7 @@ const ACRONYMS = [ // to be expanded: e.g. "BBC" --> "B B C"
 	'UK',
 	'US',
 	'WPP',
-	'WTO',
+	'WTO'
 ];
 const ACRONYMS_PATTERN = `\\b(${ACRONYMS.join('|') })\\b`;
 const ACRONYMS_REGEXP  = new RegExp(ACRONYMS_PATTERN, 'g');
@@ -49,7 +49,7 @@ const REPLACEMENT_WORD_PAIRS = [ // replace 1st with 2nd, NB wraps 1st in word b
 	["Donald Trump’s", "Donald Trumps"],
 	['Donald Trump', 'Donald Trump,'],
 	['Ms',       'Ms.'],
-	['firstFT',  'first FT'],
+	['firstFT',  'first FT']
 ];
 const REPLACEMENT_WORD_PAIRS_PATTERN = REPLACEMENT_WORD_PAIRS.map(
 	r => { return [new RegExp(`\\b${r[0]}\\b`, 'ig'), r[1]]; }
@@ -76,7 +76,7 @@ const PERMITTED_SSML_ELEMENTS = [
 	'say-as',
 	'speak',
 	'sub',
-	'w',
+	'w'
 ];
 
 function processText(rawContent) {
