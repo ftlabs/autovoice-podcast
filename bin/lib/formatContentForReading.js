@@ -7,6 +7,7 @@ const ACRONYMS = [ // to be expanded: e.g. "BBC" --> "B B C"
 	'CIO',
 	'EU',
 	'FBI',
+	'IAG',
 	'ICE',
 	'IMF',
 	'IPO',
@@ -18,7 +19,7 @@ const ACRONYMS = [ // to be expanded: e.g. "BBC" --> "B B C"
 	'UK',
 	'US',
 	'WPP',
-	'WTO'
+	'WTO',
 ];
 const ACRONYMS_PATTERN = `\\b(${ACRONYMS.join('|') })\\b`;
 const ACRONYMS_REGEXP  = new RegExp(ACRONYMS_PATTERN, 'g');
@@ -82,8 +83,8 @@ function processText(rawContent) {
 
 	let content = rawContent
 	.replace(ELEMENT_REMOVALS_REGEXP, ' ') // replace the matched open/close elements with a space
-	.replace(/<\/?(p|p [^>]*)>/g, '. ') // replace P tags with dots to contribute to punctuation
-	.replace(/<\/?(li|li [^>]*)>/g, '. ') // replace li tags with dots to contribute to punctuation
+	.replace(/<\/p>/g, '. ') // replace closing P tags with dots to contribute to punctuation
+	.replace(/<\/li>/g, '. ') // replace closing li tags with dots to contribute to punctuation
 	;
 
 	const containsSpeak = content.match(/^\s*<speak>/);
