@@ -7,6 +7,7 @@ const ACRONYMS = [ // to be expanded: e.g. "BBC" --> "B B C"
 	'CIO',
 	'EU',
 	'FBI',
+	'IAG',
 	'ICE',
 	'IMF',
 	'IPO',
@@ -48,7 +49,7 @@ const REPLACEMENT_WORD_PAIRS = [ // replace 1st with 2nd, NB wraps 1st in word b
 	["Donald Trump’s", "Donald Trumps"],
 	['Donald Trump', 'Donald Trump,'],
 	['Ms',       'Ms.'],
-	['firstFT',  'first FT'],
+	['firstFT',  'first FT']
 ];
 const REPLACEMENT_WORD_PAIRS_PATTERN = REPLACEMENT_WORD_PAIRS.map(
 	r => { return [new RegExp(`\\b${r[0]}\\b`, 'ig'), r[1]]; }
@@ -75,15 +76,15 @@ const PERMITTED_SSML_ELEMENTS = [
 	'say-as',
 	'speak',
 	'sub',
-	'w',
+	'w'
 ];
 
 function processText(rawContent) {
 
 	let content = rawContent
 	.replace(ELEMENT_REMOVALS_REGEXP, ' ') // replace the matched open/close elements with a space
-	.replace(/<\/?(p|p [^>]*)>/g, '. ') // replace P tags with dots to contribute to punctuation
-	.replace(/<\/?(li|li [^>]*)>/g, '. ') // replace li tags with dots to contribute to punctuation
+	.replace(/<\/p>/g, '. ') // replace closing P tags with dots to contribute to punctuation
+	.replace(/<\/li>/g, '. ') // replace closing li tags with dots to contribute to punctuation
 	;
 
 	const containsSpeak = content.match(/^\s*<speak>/);
