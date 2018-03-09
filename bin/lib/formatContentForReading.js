@@ -2,6 +2,7 @@ const     debug = require('debug')('bin:lib:formatContentForReading');
 const striptags = require('striptags');
 
 const ACRONYMS = [ // to be expanded: e.g. "BBC" --> "B B C"
+	'AMD',
 	'BBC',
 	'CEO',
 	'CIO',
@@ -49,8 +50,10 @@ const REPLACEMENT_WORD_PAIRS = [ // replace 1st with 2nd, NB wraps 1st in word b
 	["Donald Trump’s", "Donald Trumps"],
 	['Donald Trump', 'Donald Trump,'],
 	['Ms',       'Ms.'],
-	['firstFT',  'first FT']
+	['firstFT',  'first FT'],
+	['@ft.com', '@ F T dot com']
 ];
+
 const REPLACEMENT_WORD_PAIRS_PATTERN = REPLACEMENT_WORD_PAIRS.map(
 	r => { return [new RegExp(`\\b${r[0]}\\b`, 'ig'), r[1]]; }
 );
