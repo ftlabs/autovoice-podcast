@@ -3,15 +3,16 @@
   <head>
     <meta charset="UTF-8">
     <title>process text and run it via TTS</title>
+    <link rel="stylesheet" type="text/css" href="snippet.css">
   </head>
   <body>
     <form action="/snippet.mp3" methd="get">
     Text:<br>
-    <textarea name="text" rows="4" cols="40">Testing testing. 1 2 3 testing. It's not easy being green.</textarea>
+    <textarea name="text" rows="10" cols="100"><speak>Testing testing. 1 2 3 testing. It's not easy being green.</speak></textarea>
     Voice:
     <select name="voice">
       <option value="Emma">Emma (British)</option>
-      <option value="Amy">Amy (British)</option>
+      <option value="Amy" selected>Amy (British)</option>
       <option value="Brian">Brian (British)</option>
       <option value="Geraint">Geraint (Welsh English)</option>
       <option value="Nicole">Nicole (Australian)</option>
@@ -35,5 +36,88 @@
     <input type="radio" name="wrap" value="yes">yes</input>
     <input type="radio" name="wrap" value="no" checked>no</input>
   </form>
+      <h3>SSML Tag Options</h3>
+      <div class="column-one">
+        <ul><h4><a href="https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#prosody">Volume:</a></h4>
+            <li>&ltprosody volume="silent"&gt &lt/prosody&gt </li>
+            <li>&ltprosody volume="x-soft"&gt &lt/prosody&gt </li>
+            <li>&ltprosody volume="soft"&gt &lt/prosody&gt </li>
+            <li>&ltprosody volume="medium"&gt &lt/prosody&gt </li>
+            <li>&ltprosody volume="loud"&gt &lt/prosody&gt </li>
+            <li>&ltprosody volume="x-loud"&gt &lt/prosody&gt </li>
+        </ul>
+        <ul><h4><a href="https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#prosody">Pitch:</a></h4>
+            <li>&ltprosody pitch="x-low"&gt &lt/prosody&gt </li>
+            <li>&ltprosody pitch="low"&gt &lt/prosody&gt </li>
+            <li>&ltprosody pitch="medium"&gt &lt/prosody&gt </li>
+            <li>&ltprosody pitch="high"&gt &lt/prosody&gt </li>
+            <li>&ltprosody pitch="x-high"&gt &lt/prosody&gt </li>
+        </ul>
+        <ul><h4><a href="https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#prosody">Rate:</a></h4>
+            <li>&ltprosody rate="x-slow"&gt &lt/prosody&gt </li>
+            <li>&ltprosody rate="slow"&gt &lt/prosody&gt </li>
+            <li>&ltprosody rate="medium"&gt &lt/prosody&gt </li>
+            <li>&ltprosody rate="fast"&gt &lt/prosody&gt </li>
+            <li>&ltprosody rate="x-fast"&gt &lt/prosody&gt </li>
+        </ul>
+        <ul><h4><a href="https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#break">Break:</a></h4>
+            <li>&ltbreak strength="none"/&gt</li>
+            <li>&ltbreak strength="x-weak"/&gt</li>
+            <li>&ltbreak strength="weak"/&gt</li>
+            <li>&ltbreak strength="medium"/&gt</li>
+            <li>&ltbreak strength="strong"/&gt</li>
+            <li>&ltbreak strength="x-strong"/&gt</li>
+            <li>&ltbreak time="3s"/&gt</li>
+            <li>&ltbreak time="100ms"/&gt</li>
+        </ul>
+        <ul><h4><a href="https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#emphasis">Emphasis:</a></h4>
+          <li>&ltemphasis level="strong"&gt &lt/emphasis&gt </li>
+          <li>&ltemphasis level="moderate"&gt &lt/emphasis&gt </li>
+          <li>&ltemphasis level="reduced"&gt &lt/emphasis&gt </li>
+        </ul>
+        <ul><h4><a href="https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#phoneme">Phoneme:</a></h4>
+            <li>&ltphoneme alphabet="ipa" ph="ˈbɑ.təl"&gt bottel &lt/phoneme&gt </li>
+        </ul>
+        <ul><h4><a href="https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#say-as">Say as:</a></h4>
+            <li>&ltsay-as interpret-as="characters"&gtonomatopoeia&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="spell-out"&gtonomatopoeia&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="cardinal"&gt1234&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="number"&gt1234&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="ordinal"&gt1234&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="digits"&gt1234&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="fraction"&gt3/4&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="unit"&gt3&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="date" format="dmy"&gt04-20-1998&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="time"&gt10:15&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="telephone"&gt020 7775 6248 &lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="address"&gt1 Southwark Bridge&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="interjection"&gtWOW&lt/say-as&gt </li>
+            <li>&ltsay-as interpret-as="expletive"&gtBeep&lt/say-as&gt </li>
+        </ul>
+        <ul><h4><a href="https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#sub">Sub:</a></h4>
+            <li>&ltsub alias="aluminum"&gtAl&lt/sub&gt</li>
+        </ul>
+        <ul><h4><a href="https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#amazon-effect">Amazon:</a></h4>
+            <li>&ltamazon:effect name="whispered"&gtI am not a real human.&lt/amazon:effect&gt.
+        </ul>
+      </div>
+      <div class="column-two">
+        <ul><h4>Alternative voices:</h4>
+          <li><strong>Elderly:</strong></li>
+            <li class="tag">&ltprosody pitch="x-high" rate="x-slow"&gt “I can’t deal in hypotheticals”&lt/prosody&gt</li>
+          <li><strong>Irritated:</strong></li>
+            <li class="tag">&ltprosody pitch="x-high" volume="x-loud" rate="fast"> “I can’t deal in hypotheticals”&lt/prosody&gt</li>
+          <li><strong>Brush off irritation:</strong></li>
+            <li class="tag">&ltprosody pitch="x-low" volume="x-loud" rate="x-fast"> “I can’t deal in hypotheticals”&lt/prosody&gt</li>
+          <li><strong>Talking to someone as if they are stupid:</strong></li>
+            <li class="tag">&ltprosody pitch="x-low" volume="x-loud" rate="60%">"Have you tried turning the power on and off"&lt/prosody&gt</li>
+          <li><strong>Short rhetorical question:</strong></li>
+            <li class="tag">&ltprosody volume="loud" rate="fast" pitch="high"&gt"What technology?"&lt/prosody&gt</li>
+          <li><strong>Rhetorical question:</strong></li>
+            <li class="tag">&ltprosody volume="loud" rate="90%" pitch="high"&gt"How many of your teachers &ltbreak time="50ms"/&gt would &ltemphasis level="strong"&gtyou&lt/emphasis&gt have trusted &ltbreak time="10ms"/> with a gun?"&lt/prosody&gt</li>
+          <li><strong>Sick person:</strong></li>
+            <li class="tag">&ltprosody pitch="high" volume="x-soft" rate="60%">"I am not sure when I will be back to work"&lt/prosody&gt</li>
+        </ul>
+      </div>
   </body>
 </html>
