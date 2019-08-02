@@ -14,8 +14,8 @@ if (! CAPI_KEY ) {
 	throw new Error('ERROR: CAPI_KEY not specified in env');
 }
 
-const CAPI_PATH = 'http://api.ft.com/enrichedcontent/';
-const SAPI_PATH = 'http://api.ft.com/content/search/v1';
+const CAPI_PATH = 'https://api.ft.com/enrichedcontent/';
+const SAPI_PATH = 'https://api.ft.com/content/search/v1';
 
 const UUID_WEB_URL_PREFIX = 'http://www.ft.com/content/';
 
@@ -109,7 +109,7 @@ function extractFirstFtIds( sapiObj ){
 }
 
 // <ft-content type=\"http://www.ft.com/ontology/content/Article\" url=\"http://api.ft.com/content/dd033082-49e9-11e7-a3f4-c742b9791d43\" title=\"www.ft.com\">paid up to $1bn</ft-content>
-const reFtContent = new RegExp(/<ft-content\s+type=\"http:\/\/www.ft.com\/ontology\/content\/Article\"\s+url=\"http:\/\/api.ft.com\/content\/([a-f0-9-]+)\"/, 'g');
+const reFtContent = new RegExp(/<ft-content\s+type=\"https?:\/\/www.ft.com\/ontology\/content\/Article\"\s+url=\"https?:\/\/api.ft.com\/content\/([a-f0-9-]+)\"/, 'g');
 
 function getLastFewFirstFtMentionedUuids(maxResults, includeFirstFtUuids=false) {
 	return searchLastFewFirstFt(maxResults)
