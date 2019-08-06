@@ -108,7 +108,7 @@ function extractFirstFtIds( sapiObj ){
 	return uuids
 }
 
-// <ft-content type=\"http://www.ft.com/ontology/content/Article\" url=\"http://api.ft.com/content/dd033082-49e9-11e7-a3f4-c742b9791d43\" title=\"www.ft.com\">paid up to $1bn</ft-content>
+// <ft-content type=\"http://www.ft.com/ontology/content/Article\" url=\"https://api.ft.com/content/dd033082-49e9-11e7-a3f4-c742b9791d43\" title=\"www.ft.com\">paid up to $1bn</ft-content>
 const reFtContent = new RegExp(/<ft-content\s+type=\"https?:\/\/www.ft.com\/ontology\/content\/Article\"\s+url=\"https?:\/\/api.ft.com\/content\/([a-f0-9-]+)\"/, 'g');
 
 function getLastFewFirstFtMentionedUuids(maxResults, includeFirstFtUuids=false) {
