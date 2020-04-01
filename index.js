@@ -10,8 +10,6 @@ const         individualUUIDs = require('./bin/lib/individualUUIDs');
 const            fetchContent = require('./bin/lib/fetchContent');
 const             validateUrl = require('./bin/lib/validate-url');
 
-// const authS3O = require('s3o-middleware');
-// const validateRequest = require('./bin/lib/check-token');
 
 const session = require('cookie-session');
 const OktaMiddleware = require('@financial-times/okta-express-middleware');
