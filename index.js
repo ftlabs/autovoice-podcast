@@ -362,11 +362,20 @@ app.get('/content/getLastFewFirstFtMentionedUuids/:maxResults', (req, res) => {
 app.get('/content/getRecentWithoutAmy/:maxResults', (req, res) => {
   fetchContent.getRecentArticlesWithAvailability(req.params.maxResults)
   .then( articles => {
+    const availabilityStatusCounts = {};
+    articles.forEach( article => {
+      if (!availabilityStatusCounts.hasOwnProperty(article.availabilityStatus)) {
+        availabilityStatusCounts[article.availabilityStatus] = 0;
+      }
+      availabilityStatusCounts[article.availabilityStatus] += 1;
+    });
     const notAudioSuitable = articles.filter( a => ! a.isAudioSuitable );
     const shouldHaveAudioButDont = articles.filter( a => a.isAudioSuitable && !a.hasAudio );
     return {
+      description: "looking at the most recent articles published, check their audio situation on the audio-available service and display a summary",
       maxResults: req.params.maxResults,
       numFound: articles.length,
+      availabilityStatusCounts: availabilityStatusCounts,
       numNotAudioSuitable: notAudioSuitable.length,
       numAudioSuitable: articles.length - notAudioSuitable.length,
       numShouldHaveAudioButDont: shouldHaveAudioButDont.length,
