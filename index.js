@@ -360,7 +360,19 @@ app.get('/content/getLastFewFirstFtMentionedUuids/:maxResults', (req, res) => {
 });
 
 app.get('/content/getRecentWithoutAmy/:maxResults', (req, res) => {
-  fetchContent.getRecentWithoutAmy(req.params.maxResults)
+  fetchContent.getRecentArticlesWithAvailability(req.params.maxResults)
+  .then( articles => {
+    const numNotAudioSuitable = articles.filter( a => ! a.isAudioSuitable ).length;
+    const shouldHaveAudioButDont = articles.filter( a => a.isAudioSuitable && !a.hasAudio );
+    return {
+      maxResults: req.params.maxResults,
+      numFound: articles.length,
+      numNotAudioSuitable: numNotAudioSuitable,
+      numAudioSuitable: articles.length - numNotAudioSuitable,
+      numShouldHaveAudioButDont: shouldHaveAudioButDont.length,
+      shouldHaveAudioButDont: shouldHaveAudioButDont
+    }
+  })
   .then( item => { res.json( item ); })
   .catch( err => {
     res.status(400).send( debug(err) ).end();
