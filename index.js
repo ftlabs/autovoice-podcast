@@ -359,6 +359,15 @@ app.get('/content/getLastFewFirstFtMentionedUuids/:maxResults', (req, res) => {
   ;
 });
 
+app.get('/content/getRecentWithoutAmy/:maxResults', (req, res) => {
+  fetchContent.getRecentWithoutAmy(req.params.maxResults)
+  .then( item => { res.json( item ); })
+  .catch( err => {
+    res.status(400).send( debug(err) ).end();
+	})
+  ;
+});
+
 //---
 
 app.listen(process.env.PORT, function(){

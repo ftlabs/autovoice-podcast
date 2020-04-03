@@ -84,6 +84,33 @@ function search(params) {
 	;
 }
 
+function getRecentWithoutAmy(maxResults) {
+	return search({maxResults: maxResults})
+	.then( searchResult => {
+		const sapiObj = searchResult.sapiObj;
+		let articles = [];
+		if( ! sapiObj ) {
+			debug(`getRecentWithoutAmy: no sapiObj`);
+		} else if (! sapiObj.results ) {
+			debug(`getRecentWithoutAmy: no sapiObj.results`);
+		} else if (! sapiObj.results[0]) {
+			debug(`getRecentWithoutAmy: no sapiObj.results[0]`);
+		} else if (! sapiObj.results[0].results) {
+			debug(`getRecentWithoutAmy: no sapiObj.results[0].results`);
+		} else if (sapiObj.results[0].results.length == 0) {
+			debug(`getRecentWithoutAmy: sapiObj.results[0].results.length == 0`);
+		} else {
+			articles = sapiObj.results[0].results.map( r => { return {
+				title: r.title.title,
+				id: r.id
+			} } );
+		}
+		return articles
+	})
+	;
+}
+
+
 function searchByUUID(uuid) {
 	return search({queryString: uuid});
 }
@@ -244,4 +271,5 @@ module.exports = {
 	searchByUUID,
 	searchLastFewFirstFt,
 	getLastFewFirstFtMentionedUuids,
+	getRecentWithoutAmy
 };
