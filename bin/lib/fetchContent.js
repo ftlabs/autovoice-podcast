@@ -31,6 +31,12 @@ if (!AUDIO_AVAILABLE_SKIP_METADATA_CSV) {
 
 const AUDIO_AVAILABLE_SKIP_METADATA = AUDIO_AVAILABLE_SKIP_METADATA_CSV.split(',');
 
+const ADD_UUID_PREFIX = process.env.ADD_UUID_PREFIX;
+if (! ADD_UUID_PREFIX) {
+	throw new Error('ERROR: ADD_UUID_PREFIX not specified in env')
+}
+
+
 function constructSAPIQuery( params ) {
 
 	const defaults = {
@@ -188,6 +194,7 @@ function getRecentArticlesWithAvailability(maxResults) {
 						a.hasAudio = hasAudio;
 						a.durationSecs = durationSecs;
 						a.availabilityUrl = `${AUDIO_AVAILABLE_PREFIX}${a.id}`;
+						a.addUUIDForAudioUrl = `${ADD_UUID_PREFIX}${a.id}`;
 						return a;
 					})
 				}
