@@ -24,12 +24,12 @@ if (! AUDIO_AVAILABLE_PREFIX ) {
 	throw new Error('ERROR: AUDIO_AVAILABLE_PREFIX not specified in env');
 }
 
-const AUDIO_AVAILABLE_SKIP_BRANDS_CSV = process.env.AUDIO_AVAILABLE_SKIP_BRANDS_CSV;
-if (!AUDIO_AVAILABLE_SKIP_BRANDS_CSV) {
-	throw new Error('ERROR: AUDIO_AVAILABLE_SKIP_BRANDS_CSV not specified in env')
+const AUDIO_AVAILABLE_SKIP_METADATA_CSV = process.env.AUDIO_AVAILABLE_SKIP_METADATA_CSV;
+if (!AUDIO_AVAILABLE_SKIP_METADATA_CSV) {
+	throw new Error('ERROR: AUDIO_AVAILABLE_SKIP_METADATA_CSV not specified in env')
 }
 
-AUDIO_AVAILABLE_SKIP_BRANDS = AUDIO_AVAILABLE_SKIP_BRANDS_CSV.split(',');
+const AUDIO_AVAILABLE_SKIP_METADATA = AUDIO_AVAILABLE_SKIP_METADATA_CSV.split(',');
 
 function constructSAPIQuery( params ) {
 
@@ -125,12 +125,24 @@ function getRecentArticlesWithAvailability(maxResults) {
 			debug(`getRecentArticlesWithAvailability: sapiObj.results[0].results.length == 0`);
 		} else {
 			articles = sapiObj.results[0].results.map( r => {
-				const isNotAudioSuitable = r.hasOwnProperty('metadata')
-				&& r.metadata.hasOwnProperty('brand')
-				&& r.metadata.brand.filter( m => {
-					return m.hasOwnProperty('term') && AUDIO_AVAILABLE_SKIP_BRANDS.includes( m.term.name );
-				} ).length > 0;
-
+				let isNotAudioSuitable = false;
+				if( r.hasOwnProperty('metadata') ){
+					AUDIO_AVAILABLE_SKIP_METADATA.forEach( skipString => {
+						const skipPair = skipString.split(':');
+						if (skipPair.length === 2) {
+							let group, name;
+							[group, name] = skipPair;
+							if (true) {
+								if (r.metadata.hasOwnProperty(group)) {
+									const matchingTerms = r.metadata[group].filter( m => { return m.hasOwnProperty('term') && m.term.name === name;} );
+									if (matchingTerms.length > 0 ) {
+										isNotAudioSuitable = true;
+									}
+								}
+							}
+						}
+					});
+				}
 				let metadataSummary = {};
 				if (r.hasOwnProperty('metadata')) {
 					Object.keys(r.metadata).forEach( group => {
