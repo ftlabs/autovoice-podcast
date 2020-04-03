@@ -360,8 +360,14 @@ app.get('/content/getLastFewFirstFtMentionedUuids/:maxResults', (req, res) => {
 });
 
 app.get('/content/getRecentWithoutAmy/:maxResults', (req, res) => {
-  fetchContent.getRecentArticlesWithAvailability(req.params.maxResults)
+  let maxResults = parseInt( req.params.maxResults );
+  const offset = (req.params.maxResults>100)? req.params.maxResults-100 : 0;
+  maxResults = maxResults - offset;
+  fetchContent.getRecentArticlesWithAvailability(maxResults, offset)
   .then( articles => {
+    const notAudioSuitable = articles.filter( a => ! a.isAudioSuitable );
+    const shouldHaveAudioButDont = articles.filter( a => a.isAudioSuitable && !a.hasAudio );
+
     const availabilityStatusCounts = {};
     articles.forEach( article => {
       if (!availabilityStatusCounts.hasOwnProperty(article.availabilityStatus)) {
@@ -369,16 +375,29 @@ app.get('/content/getRecentWithoutAmy/:maxResults', (req, res) => {
       }
       availabilityStatusCounts[article.availabilityStatus] += 1;
     });
-    const notAudioSuitable = articles.filter( a => ! a.isAudioSuitable );
-    const shouldHaveAudioButDont = articles.filter( a => a.isAudioSuitable && !a.hasAudio );
+
+    const shouldHaveAudioButDontHourCounts = {};
+    shouldHaveAudioButDont.forEach( article => {
+      const dateWithHour = article.lastPublishDateTime.split(':')[0];
+      if (!shouldHaveAudioButDontHourCounts.hasOwnProperty(dateWithHour)) {
+        shouldHaveAudioButDontHourCounts[dateWithHour] = 0;
+      }
+      shouldHaveAudioButDontHourCounts[dateWithHour] += 1;
+    });
+
+
     return {
-      description: "looking at the most recent articles published, check their audio situation on the audio-available service and display a summary",
-      maxResults: req.params.maxResults,
+      description: "Looking at the most recent articles published, check their audio situation on the audio-available service and display a summary. NB, only a maximum of 100 results are returned, so specifying more than that will result in an offset to the 100 oldest (e.g. specifying 1000 means you'll get the oldest 100 of the most recent 1000, i.e. 901-1000)",
+      maxResults: maxResults,
+      offset: offset,
+      moistRecentDate: articles[0].lastPublishDateTime,
+      leastRecentDate: articles[articles.length-1].lastPublishDateTime,
       numFound: articles.length,
       availabilityStatusCounts: availabilityStatusCounts,
       numNotAudioSuitable: notAudioSuitable.length,
       numAudioSuitable: articles.length - notAudioSuitable.length,
       numShouldHaveAudioButDont: shouldHaveAudioButDont.length,
+      shouldHaveAudioButDontHourCounts: shouldHaveAudioButDontHourCounts,
       shouldHaveAudioButDont: shouldHaveAudioButDont,
       notAudioSuitable: notAudioSuitable
     }

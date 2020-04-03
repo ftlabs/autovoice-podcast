@@ -108,10 +108,11 @@ function getAudioAvailable( uuid ) {
 	return fetch( url );
 }
 
-function getRecentArticlesWithAvailability(maxResults) {
+function getRecentArticlesWithAvailability(maxResults, offset=0) {
 	// search for latest articles, then check audio-availability of each
 	const queryParams = {
 		maxResults: maxResults,
+		offset: offset,
 		aspects: ["title", "location", "summary", "lifecycle", "metadata"],
 	}
 
