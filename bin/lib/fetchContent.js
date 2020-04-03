@@ -85,7 +85,12 @@ function search(params) {
 }
 
 function getRecentWithoutAmy(maxResults) {
-	return search({maxResults: maxResults})
+	const queryParams = {
+		maxResults: maxResults,
+		aspects: ["title", "location", "summary", "lifecycle", "metadata"],
+	}
+
+	return search(queryParams)
 	.then( searchResult => {
 		const sapiObj = searchResult.sapiObj;
 		let articles = [];
@@ -100,10 +105,20 @@ function getRecentWithoutAmy(maxResults) {
 		} else if (sapiObj.results[0].results.length == 0) {
 			debug(`getRecentWithoutAmy: sapiObj.results[0].results.length == 0`);
 		} else {
-			articles = sapiObj.results[0].results.map( r => { return {
-				title: r.title.title,
-				id: r.id
-			} } );
+			articles = sapiObj.results[0].results.map( r => {
+				const isFastFt = r.hasOwnProperty('metadata')
+				&& r.metadata.hasOwnProperty('brand')
+				&& r.metadata.brand.filter( m => {
+					return m.hasOwnProperty('term') && m.term.name == 'fastFT'
+				} ).length > 0;
+
+				return {
+					title: r.title.title,
+					id: r.id,
+					lastPublishDateTime: r.lifecycle.lastPublishDateTime,
+					isFastFt,
+				}
+			} );
 		}
 		return articles
 	})
