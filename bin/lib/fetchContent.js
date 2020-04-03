@@ -24,6 +24,13 @@ if (! AUDIO_AVAILABLE_PREFIX ) {
 	throw new Error('ERROR: AUDIO_AVAILABLE_PREFIX not specified in env');
 }
 
+const AUDIO_AVAILABLE_SKIP_BRANDS_CSV = process.env.AUDIO_AVAILABLE_SKIP_BRANDS_CSV;
+if (!AUDIO_AVAILABLE_SKIP_BRANDS_CSV) {
+	throw new Error('ERROR: AUDIO_AVAILABLE_SKIP_BRANDS_CSV not specified in env')
+}
+
+AUDIO_AVAILABLE_SKIP_BRANDS = AUDIO_AVAILABLE_SKIP_BRANDS_CSV.split(',');
+
 function constructSAPIQuery( params ) {
 
 	const defaults = {
@@ -121,19 +128,15 @@ function getRecentArticlesWithAvailability(maxResults) {
 				const isNotAudioSuitable = r.hasOwnProperty('metadata')
 				&& r.metadata.hasOwnProperty('brand')
 				&& r.metadata.brand.filter( m => {
-					return m.hasOwnProperty('term')
-					&& (m.term.name == 'fastFT' || m.term.name == 'FT Alphaville')
+					return m.hasOwnProperty('term') && AUDIO_AVAILABLE_SKIP_BRANDS.includes( m.term.name );
 				} ).length > 0;
 
-				let metadataSummary = undefined;
+				let metadataSummary = {};
 				if (r.hasOwnProperty('metadata')) {
-					metadataSummary = Object.keys(r.metadata).map( group => {
+					Object.keys(r.metadata).forEach( group => {
 						const groupItems = (Array.isArray(r.metadata[group]))? r.metadata[group] : [r.metadata[group]];
-						return [
-							group,
-							groupItems.map( term => term.term.name ).join(',')
-						].join(':');
-					}).join('; ');
+						metadataSummary[group] = groupItems.map(item => item.term.name).join(', ');
+					});
 				}
 
 				return {
