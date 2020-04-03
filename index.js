@@ -362,15 +362,16 @@ app.get('/content/getLastFewFirstFtMentionedUuids/:maxResults', (req, res) => {
 app.get('/content/getRecentWithoutAmy/:maxResults', (req, res) => {
   fetchContent.getRecentArticlesWithAvailability(req.params.maxResults)
   .then( articles => {
-    const numNotAudioSuitable = articles.filter( a => ! a.isAudioSuitable ).length;
+    const notAudioSuitable = articles.filter( a => ! a.isAudioSuitable );
     const shouldHaveAudioButDont = articles.filter( a => a.isAudioSuitable && !a.hasAudio );
     return {
       maxResults: req.params.maxResults,
       numFound: articles.length,
-      numNotAudioSuitable: numNotAudioSuitable,
-      numAudioSuitable: articles.length - numNotAudioSuitable,
+      numNotAudioSuitable: notAudioSuitable.length,
+      numAudioSuitable: articles.length - notAudioSuitable.length,
       numShouldHaveAudioButDont: shouldHaveAudioButDont.length,
-      shouldHaveAudioButDont: shouldHaveAudioButDont
+      shouldHaveAudioButDont: shouldHaveAudioButDont,
+      notAudioSuitable: notAudioSuitable
     }
   })
   .then( item => { res.json( item ); })

@@ -125,11 +125,23 @@ function getRecentArticlesWithAvailability(maxResults) {
 					&& (m.term.name == 'fastFT' || m.term.name == 'FT Alphaville')
 				} ).length > 0;
 
+				let metadataSummary = undefined;
+				if (r.hasOwnProperty('metadata')) {
+					metadataSummary = Object.keys(r.metadata).map( group => {
+						const groupItems = (Array.isArray(r.metadata[group]))? r.metadata[group] : [r.metadata[group]];
+						return [
+							group,
+							groupItems.map( term => term.term.name ).join(',')
+						].join(':');
+					}).join('; ');
+				}
+
 				return {
 					title: r.title.title,
 					id: r.id,
 					url: `${UUID_WEB_URL_PREFIX}${r.id}`,
 					lastPublishDateTime: r.lifecycle.lastPublishDateTime,
+					metadataSummary: metadataSummary,
 					isAudioSuitable: ! isNotAudioSuitable,
 				}
 			} );
