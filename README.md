@@ -52,7 +52,8 @@ The following are mandatory params, the absence of which will kill the app on st
 * CAPI_KEY=...
 
 * AUDIO_AVAILABLE_PREFIX=...
-* AUDIO_AVAILABLE_SKIP_BRANDS_CSV=...
+* AUDIO_AVAILABLE_SKIP_BRANDS_CSV=... // e.g. brand:fastFT,brand:SomethingElse
+* ADD_UUID_PREFIX=
 
 Config params (non mandatory)
 
