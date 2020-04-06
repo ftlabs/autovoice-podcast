@@ -19,6 +19,24 @@ const SAPI_PATH = 'https://api.ft.com/content/search/v1';
 
 const UUID_WEB_URL_PREFIX = 'http://www.ft.com/content/';
 
+const AUDIO_AVAILABLE_PREFIX = process.env.AUDIO_AVAILABLE_PREFIX;
+if (! AUDIO_AVAILABLE_PREFIX ) {
+	throw new Error('ERROR: AUDIO_AVAILABLE_PREFIX not specified in env');
+}
+
+const AUDIO_AVAILABLE_SKIP_METADATA_CSV = process.env.AUDIO_AVAILABLE_SKIP_METADATA_CSV;
+if (!AUDIO_AVAILABLE_SKIP_METADATA_CSV) {
+	throw new Error('ERROR: AUDIO_AVAILABLE_SKIP_METADATA_CSV not specified in env')
+}
+
+const AUDIO_AVAILABLE_SKIP_METADATA = AUDIO_AVAILABLE_SKIP_METADATA_CSV.split(',');
+
+const ADD_UUID_PREFIX = process.env.ADD_UUID_PREFIX;
+if (! ADD_UUID_PREFIX) {
+	throw new Error('ERROR: ADD_UUID_PREFIX not specified in env')
+}
+
+
 function constructSAPIQuery( params ) {
 
 	const defaults = {
@@ -68,7 +86,7 @@ function search(params) {
 	})
 	.then( res  => res.text() )
 	.then( text => {
-		debug(`search: res.text=${text}`);
+		debug(`search: res.text ok`);
 		return text;
 	})
 	.then( text => {
@@ -84,8 +102,121 @@ function search(params) {
 	;
 }
 
+function getAudioAvailable( uuid ) {
+	const url = `${AUDIO_AVAILABLE_PREFIX}${uuid}`;
+	// debug(`getAudioAvailable: url=${url}`);
+	return fetch( url );
+}
+
+function getRecentArticlesWithAvailability(maxResults, offset=0) {
+	// search for latest articles, then check audio-availability of each
+	const queryParams = {
+		maxResults: maxResults,
+		offset: offset,
+		aspects: ["title", "location", "summary", "lifecycle", "metadata"],
+	}
+
+	return search(queryParams)
+	.then( searchResult => {
+		const sapiObj = searchResult.sapiObj;
+		let articles = [];
+		if( ! sapiObj ) {
+			debug(`getRecentArticlesWithAvailability: no sapiObj`);
+		} else if (! sapiObj.results ) {
+			debug(`getRecentArticlesWithAvailability: no sapiObj.results`);
+		} else if (! sapiObj.results[0]) {
+			debug(`getRecentArticlesWithAvailability: no sapiObj.results[0]`);
+		} else if (! sapiObj.results[0].results) {
+			debug(`getRecentArticlesWithAvailability: no sapiObj.results[0].results`);
+		} else if (sapiObj.results[0].results.length == 0) {
+			debug(`getRecentArticlesWithAvailability: sapiObj.results[0].results.length == 0`);
+		} else {
+			articles = sapiObj.results[0].results.map( r => {
+				let isNotAudioSuitable = false;
+				if( r.hasOwnProperty('metadata') ){
+					AUDIO_AVAILABLE_SKIP_METADATA.forEach( skipString => {
+						const skipPair = skipString.split(':');
+						if (skipPair.length === 2) {
+							let group, name;
+							[group, name] = skipPair;
+							if (true) {
+								if (r.metadata.hasOwnProperty(group)) {
+									const matchingTerms = r.metadata[group].filter( m => { return m.hasOwnProperty('term') && m.term.name === name;} );
+									if (matchingTerms.length > 0 ) {
+										isNotAudioSuitable = true;
+									}
+								}
+							}
+						}
+					});
+				}
+				let metadataSummary = {};
+				if (r.hasOwnProperty('metadata')) {
+					Object.keys(r.metadata).forEach( group => {
+						const groupItems = (Array.isArray(r.metadata[group]))? r.metadata[group] : [r.metadata[group]];
+						metadataSummary[group] = groupItems.map(item => item.term.name).join(', ');
+					});
+				}
+
+				return {
+					title: r.title.title,
+					id: r.id,
+					url: `${UUID_WEB_URL_PREFIX}${r.id}`,
+					lastPublishDateTime: r.lifecycle.lastPublishDateTime,
+					metadataSummary: metadataSummary,
+					isAudioSuitable: ! isNotAudioSuitable,
+				}
+			} );
+		}
+		return articles
+	})
+	.then( articles => {
+		const articlesWithAvailability = articles.map( a => {
+			return getAudioAvailable( a.id )
+			.then( availResponse => {
+				a.availabilityStatus = availResponse.status;
+				if (!availResponse.ok) {
+					debug( `getRecentArticlesWithAvailability: search.then: id=${a.id}: availResponse not ok: status=${availResponse.status}`);
+					a.hasAudio = undefined;
+					a.durationSecs = undefined;
+					a.availabilityUrl = undefined;
+					return a;
+				} else {
+					return availResponse.json()
+					.then( availJson => {
+						let hasAudio = undefined;
+						let durationSecs = undefined;
+
+						if (availJson.hasOwnProperty('duration') && availJson.duration.hasOwnProperty('seconds')) {
+							durationSecs = availJson.duration.seconds;
+						}
+						hasAudio = availJson.haveFile;
+
+						a.hasAudio = hasAudio;
+						a.durationSecs = durationSecs;
+						a.availabilityUrl = `${AUDIO_AVAILABLE_PREFIX}${a.id}`;
+						a.addUUIDForAudioUrl = `${ADD_UUID_PREFIX}${a.id}`;
+						return a;
+					})
+				}
+			})
+			.then( articleWithAvailability => {
+				// debug( `getRecentArticlesWithAvailability: search.then: articleWithAvailability: id=${articleWithAvailability.id}, availabilityStatus=${articleWithAvailability.availabilityStatus}, hasAudio=${articleWithAvailability.hasAudio}, durationSecs=${articleWithAvailability.durationSecs}` );
+				return articleWithAvailability;
+			})
+		})
+		;
+		return Promise.all( articlesWithAvailability );
+	})
+	;
+}
+
+
 function searchByUUID(uuid) {
-	return search({queryString: uuid});
+	return search({
+		queryString: uuid,
+		aspects: ["title", "location", "summary", "lifecycle", "metadata"],
+});
 }
 
 function searchLastFewFirstFt(maxResults) {
@@ -244,4 +375,5 @@ module.exports = {
 	searchByUUID,
 	searchLastFewFirstFt,
 	getLastFewFirstFtMentionedUuids,
+	getRecentArticlesWithAvailability
 };
