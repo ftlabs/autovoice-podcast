@@ -30,7 +30,7 @@ More details
    * returns processed text
    * to show how the text is munged before being passed to TTS
 * /formatArticleForListening.html
-   * a form which formats and returns MP3 article content based on the uuid inputted 
+   * a form which formats and returns MP3 article content based on the uuid inputted
 * /static/format.html
    * a form which invokes the /format endpoint
 * /snippet.mp3?text=some words to be processed and spoken&voice=voiceId
@@ -59,6 +59,10 @@ OKTA_CLIENT=
 OKTA_ISSUER=
 OKTA_SECRET=
 SESSION_TOKEN=
+
+* AUDIO_AVAILABLE_PREFIX=...
+* AUDIO_AVAILABLE_SKIP_BRANDS_CSV=... // e.g. brand:fastFT,brand:SomethingElse
+* ADD_UUID_PREFIX=
 
 Config params (non mandatory)
 
