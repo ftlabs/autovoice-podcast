@@ -53,8 +53,8 @@ The following are mandatory params, the absence of which will kill the app on st
 
 The following are mandatory OKTA authentication params:
 
-PORT=3002
-BASE_URL=http://localhost:3002
+PORT=3003
+BASE_URL=http://localhost:3003
 OKTA_CLIENT=
 OKTA_ISSUER=
 OKTA_SECRET=
