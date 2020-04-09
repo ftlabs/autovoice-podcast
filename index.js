@@ -34,7 +34,7 @@ var requestLogger = function(req, res, next) {
 
 app.use(requestLogger);
 
-// these routes do *not* not require s3o or token
+// these routes do *not* not require OKTA or token
 
 app.use('/static', express.static('static'));
 
@@ -56,7 +56,7 @@ app.get('/audio.mp3', (req, res) => {
   }
 });
 
-// these routes do require s3o or token
+// these routes do require OKTA or token
 
 /*
 if (! process.env.hasOwnProperty('TOKEN')) {

@@ -51,6 +51,15 @@ The following are mandatory params, the absence of which will kill the app on st
 * TOKEN=...
 * CAPI_KEY=...
 
+The following are mandatory OKTA authentication params:
+
+PORT=3002
+BASE_URL=http://localhost:3002
+OKTA_CLIENT=
+OKTA_ISSUER=
+OKTA_SECRET=
+SESSION_TOKEN=
+
 Config params (non mandatory)
 
 * TTS_CONCURRENCE=... (default 4) max num of concurrent requests to the TTS service
@@ -62,3 +71,8 @@ These are for local builds:
    * to use when constructing the podcast feed
    * e.g. when developing locally, http://localhost:8060
 * DEBUG=autovoice:\*,bin:lib:\*
+
+#### Where to find OKTA .env vars
+
+- Get `SESSION_TOKEN` from LastPass
+- Get details for finding `OKTA_ISSUER`, `OKTA_CLIENT` & `OKTA_SECRET` in LastPass
