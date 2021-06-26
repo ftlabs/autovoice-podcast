@@ -5,18 +5,23 @@ const extractUuid = require('./extract-uuid');
 
 let uuids = [];
 
-function add( possibleUuid ) {
-	const uuid = extractUuid( possibleUuid );
-	let msg = "";
+function add( possibleUuids ) {
+	let msg = '';
 
-	if (uuid === false) {
-		msg = "no valid UUID specified";
-	} else if (uuids.includes(uuid)) {
-		msg = "UUID already added";
-	} else {
-		uuids.push(uuid);
-		msg = "UUID added";
-	}
+	possibleUuids.split(',').forEach(possibleUuid => {
+		const uuid = extractUuid( possibleUuid );
+
+		if (uuid === false) {
+			msg += `invalid UUID - ${possibleUuid}`;
+		} else if (uuids.includes(uuid)) {
+			msg += `UUID already added - ${uuid}`;
+		} else {
+			uuids.push(uuid);
+			msg += `UUID added - ${uuid}`;
+		}
+
+		msg += '<br>';
+	});
 
 	return msg;
 }

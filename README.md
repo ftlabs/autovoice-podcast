@@ -39,6 +39,13 @@ More details
 * /static/snippet.html
    * a form which invokes the /snippet.mp3 endpoint
 
+* /uuids/add/some,uuids,to,add
+  * adds a comma separated list of article UUIDs for ingestion
+* /uuids/clear
+  * clears the list of added article UUIDs
+* /uuids/list
+  * returns the list of article UUIDs added using the /uuids/add endpoint
+
 # Environment Parameters
 
 When building locally, specify them in a local file, .env (and NB, this must not be included in the git repo, hence has a specific line in .gitignore). When deploying to Heroku, they need to be specified in the app's settings, Config Variables.

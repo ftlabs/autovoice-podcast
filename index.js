@@ -263,8 +263,8 @@ app.get('/snippet.mp3', (req, res) => {
 
 //--- access points to add/remove/list individual uuids for inclusion in Audio Articles
 
-app.get('/uuids/add/:uuid', (req, res) => {
-  res.send(individualUUIDs.add(req.params.uuid));
+app.get('/uuids/add/:uuids', (req, res) => {
+  res.send(individualUUIDs.add(req.params.uuids));
 });
 
 app.get('/uuids/clear', (req, res) => {
