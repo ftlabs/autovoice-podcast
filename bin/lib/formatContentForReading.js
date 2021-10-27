@@ -51,7 +51,8 @@ const REPLACEMENT_WORD_PAIRS = [ // replace 1st with 2nd, NB wraps 1st in word b
 	['Donald Trump', 'Donald Trump,'],
 	['Ms',       'Ms.'],
 	['firstFT',  'first FT'],
-	['@ft.com', '@ F T dot com']
+	['@ft.com', '@ F T dot com'],
+	['COP26', 'copp 26'],
 ];
 
 const REPLACEMENT_WORD_PAIRS_PATTERN = REPLACEMENT_WORD_PAIRS.map(
